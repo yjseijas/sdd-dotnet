@@ -1,0 +1,121 @@
+# ============================================================
+#  .gitignore para solución .NET / ASP.NET Core
+# ============================================================
+
+# ---------------------------
+# Artefactos de compilación
+# ---------------------------
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+
+# ---------------------------
+# Visual Studio / VS Code
+# ---------------------------
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# ---------------------------
+# Rider (JetBrains)
+# ---------------------------
+.idea/
+*.sln.iml
+
+# ---------------------------
+# NuGet
+# ---------------------------
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!packages/repositories.config
+project.lock.json
+project.fragment.lock.json
+artifacts/
+nuget.config.local
+
+# ---------------------------
+# Publicación / Deploy
+# ---------------------------
+**/publish/
+**/PublishProfiles/
+*.pubxml
+*.pubxml.user
+
+# ---------------------------
+# Archivos de entorno y secretos
+# ---------------------------
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+*.pfx
+*.p12
+*.key
+
+# ---------------------------
+# Entity Framework
+# ---------------------------
+*.mdf
+*.ldf
+*.ndf
+
+# ---------------------------
+# Testing
+# ---------------------------
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+coverage*/
+.coverage/
+
+# ---------------------------
+# Node / Frontend (si aplica)
+# ---------------------------
+node_modules/
+wwwroot/dist/
+wwwroot/lib/
+npm-debug.log*
+yarn-error.log*
+.npm/
+
+# ---------------------------
+# Docker
+# ---------------------------
+docker-compose.override.yml
+.dockerignore
+
+# ---------------------------
+# Sistema operativo
+# ---------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*~
+
+# ---------------------------
+# Azure / AWS / GCP
+# ---------------------------
+.azure/
+ServiceFabricBackup/
+*.publishsettings
+
+# ---------------------------
+# Otros
+# ---------------------------
+*.bak
+*.tmp
+*.cache
