@@ -1,113 +1,103 @@
-# Implementation Plan: [FEATURE]
+# Plan de implementación: [FEATURE]
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Rama**: `[###-feature-name]` | **Fecha**: [DATE] | **Especificación**: [link]
 
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+**Entrada**: Especificación de funcionalidad de `/specs/[###-feature-name]/spec.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command; its definition describes the execution workflow.
+**Nota**: La orden `/speckit.plan` completa esta plantilla; su definición describe
+el flujo de planificación.
 
-## Summary
+## Resumen
 
-[Extract from feature spec: primary requirement + technical approach from research]
+[Extraer de la especificación: requisito principal y enfoque técnico basado en la investigación]
 
-## Technical Context
+## Contexto técnico
 
 <!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
+  ACCIÓN REQUERIDA: Reemplazar esta sección con los detalles técnicos pertinentes
+  a la funcionalidad. Los campos orientan el análisis; no implican decisiones
+  predeterminadas cuando la especificación o el proyecto no las hayan fijado.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
+**Lenguaje/versión**: [p. ej., C# y versión de .NET o REQUIERE ACLARACIÓN]
 
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+**Dependencias principales**: [p. ej., ASP.NET Core Minimal APIs, Blazor u otras]
 
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+**Persistencia**: [si corresponde, tecnología elegida o NO APLICA]
 
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]
+**Pruebas**: [estrategia y herramientas elegidas o REQUIERE ACLARACIÓN]
 
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Plataforma objetivo**: [plataforma o REQUIERE ACLARACIÓN]
 
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]
+**Tipo de proyecto**: [p. ej., servicio web, aplicación web full stack u otro]
 
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]
+**Objetivos de rendimiento**: [objetivos del dominio o NO DEFINIDOS]
 
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]
+**Restricciones**: [restricciones específicas de la funcionalidad o NINGUNA]
 
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Escala/alcance**: [dimensión relevante o NO DEFINIDO]
 
-## Constitution Check
+## Comprobación de la constitución
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+*Punto de control: debe aprobarse antes de la investigación de la Fase 0 y
+revisarse nuevamente después del diseño de la Fase 1.*
 
-[Gates determined based on constitution file]
+- [ ] El backend propuesto usa ASP.NET Core Minimal APIs, sin controladores
+  MVC, y organiza la funcionalidad verticalmente por caso de uso.
+- [ ] La interfaz web propuesta usa Blazor; la lógica de negocio del backend y
+  los contratos entre frontend y backend tienen límites explícitos.
+- [ ] Cada capa, proyecto, abstracción y dependencia nueva responde a una
+  necesidad del alcance y está justificada.
+- [ ] Los requisitos y criterios de aceptación son verificables; el plan
+  identifica cómo comprobar los comportamientos afectados y documenta si se
+  requieren pruebas automatizadas según la especificación.
+- [ ] Se identifican las validaciones de entrada, necesidades de seguridad y
+  tratamiento de datos sensibles pertinentes.
+- [ ] Los artefactos de especificación, planificación y tareas se redactan en
+  español, conservando los identificadores técnicos cuando sea necesario.
+- [ ] Las decisiones no fijadas por la constitución quedan documentadas aquí,
+  sin asumir tecnologías, patrones o modos de ejecución no aprobados.
 
-## Project Structure
+Si un punto no se cumple, revisar el diseño para ajustarlo. No se permiten
+desviaciones de una regla constitucional por mera justificación en el plan;
+una contradicción requiere una enmienda aprobada a la constitución.
 
-### Documentation (this feature)
+## Estructura del proyecto
+
+### Documentación de esta funcionalidad
 
 ```text
 specs/[###-feature]/
-├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
-├── data-model.md        # Phase 1 output (/speckit.plan command)
-├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+├── spec.md              # Especificación de esta funcionalidad
+├── plan.md              # Este plan
+├── research.md          # Resultado de la investigación de Fase 0
+├── data-model.md        # Resultado de diseño de Fase 1, si aplica
+├── quickstart.md        # Guía de Fase 1, si aplica
+├── contracts/           # Contratos de Fase 1, si aplica
+└── tasks.md             # Tareas de Fase 2
 ```
 
-### Source Code (repository root)
+### Código fuente (raíz del repositorio)
+
 <!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
+  ACCIÓN REQUERIDA: Sustituir el árbol de ejemplo con la estructura concreta
+  elegida para la funcionalidad. El árbol no prescribe nombres de carpetas,
+  proyectos o capas. Mostrar únicamente opciones seleccionadas y rutas reales.
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+# Documentar aquí los proyectos y archivos seleccionados para esta funcionalidad.
+# Mantener el backend Minimal API organizado por casos de uso y el frontend en Blazor.
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Decisión de estructura**: [Documentar la estructura seleccionada y explicar
+cómo se ajusta a los límites y principios de la constitución]
 
-## Complexity Tracking
+## Registro de complejidad
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
+> Completar solo cuando la comprobación de la constitución detecte complejidad
+> no evidente o una decisión que requiera justificación.
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| Decisión o complejidad | Necesidad que resuelve | Alternativa más simple descartada y motivo |
+|-------------------------|------------------------|--------------------------------------------|
+| [Decisión]              | [Necesidad]            | [Motivo concreto]                          |
