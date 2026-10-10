@@ -16,6 +16,16 @@ Informe de impacto de sincronización
 - Pendientes: ninguno. La fecha de ratificación corresponde a la adopción
   inicial de esta constitución.
 -->
+<!--
+Sync Impact Report
+- Version change: 1.0.0 → 1.1.0
+- Modified principles: added operational governance for spec lifecycle.
+- Added sections: Ciclo de estado de specs.
+- Removed sections: none.
+- Templates requiring updates: ✅ .specify/templates/spec-template.md updated; ✅ .github/agents/speckit.implement.agent.md updated.
+- Follow-up TODOs: none.
+-->
+
 # Constitución del Proyecto Realtor
 
 ## Principios Fundamentales
@@ -130,6 +140,35 @@ Reglas de secuencia obligatorias:
 
 ---
 
+## Ciclo de estado de specs
+
+Las especificaciones DEBEN seguir el ciclo canónico de estados siguiente:
+
+- Borrador: se usa al crear la spec.
+- Aprobada: se usa cuando la revisión de la spec queda aprobada.
+- En implementación: se usa al iniciar la implementación.
+- Implementada: se usa al finalizar la implementación con validaciones cumplidas.
+
+Solo se permiten estas transiciones:
+
+- Borrador → Aprobada
+- Aprobada → En implementación
+- En implementación → Implementada
+
+Está prohibido:
+
+- evitar o saltarse una transición por edición manual del estado;
+- cerrar una spec como Implementada si existe al menos una tarea sin completar en `tasks.md`;
+- cerrar una spec como Implementada si no existe evidencia de validación en `quickstart.md` o en la verificación ejecutada del plan;
+- dejar el estado en Implementada cuando la validación falle;
+- mantener un estado inválido sin reportar la causa explícita del bloqueo.
+
+Si falla alguna condición de cierre, el estado DEBE permanecer en En implementación y el agente DEBE reportar el bloqueo con causa explícita y trazabilidad.
+
+La transición de estado DEBE producirse automáticamente dentro del flujo del proyecto sin manipulación manual de scripts upstream ni edición aislada del archivo de la spec.
+
+---
+
 ## Modo Interactivo de Preguntas
 
 Los comandos speckit.specify y speckit.clarify operan en modo interactivo obligatorio: presentan sus preguntas de una en una y esperan respuesta antes de continuar.
@@ -226,4 +265,4 @@ Está prohibido al agente mover archivos por iniciativa propia, renombrar carpet
 La única resolución legítima es la decisión humana documentada vía enmienda constitucional o ajuste explícito de convención local.
 
 
-**Versión**: 1.0.0 | **Ratificada**: 2026-10-05 | **Última enmienda**: 2026-10-05
+**Versión**: 1.1.0 | **Ratificada**: 2026-10-05 | **Última enmienda**: 2026-10-10

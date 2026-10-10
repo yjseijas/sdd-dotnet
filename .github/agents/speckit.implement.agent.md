@@ -45,6 +45,19 @@ You **MUST** consider the user input before proceeding (if not empty).
     After emitting the block above you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
 - If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
 
+## Estado de la especificación
+
+- Lee `spec.md` y `tasks.md` antes de iniciar la implementación.
+- Si el estado actual es `Borrador`, la implementación no puede iniciar sin aprobación explícita de la spec.
+- Al iniciar la implementación, cambia el estado de la spec a `En implementación` dentro de `spec.md`.
+- Mantén el estado en `En implementación` mientras el trabajo esté en curso y no se cumplan las condiciones de cierre.
+- Para cerrar la implementación como `Implementada`, se debe cumplir que:
+  - todas las tareas de `tasks.md` estén marcadas como `[X]`;
+  - exista evidencia de validación en `quickstart.md` o en la salida de verificación del plan;
+  - no exista ninguna tarea pendiente ni bloqueo operativo.
+- Si alguna de esas condiciones falla, conserva el estado en `En implementación` y reporta explícitamente la causa del bloqueo.
+- Las transiciones solo se permiten en el orden `Borrador → Aprobada → En implementación → Implementada`.
+
 ## Outline
 
 1. Run `.specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
@@ -166,6 +179,12 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Check that implemented features match the original specification
    - Validate that tests pass and coverage meets requirements
    - Confirm the implementation follows the technical plan
+   - Confirm the spec status is valid before declaring completion
+
+10. Status closure gate:
+   - If every task in `tasks.md` is marked `[X]` and the validation evidence exists in `quickstart.md` or equivalent verification output, change the state in `spec.md` to `Implementada`.
+   - If any task remains incomplete or validation evidence is missing, keep the state in `En implementación` and report the exact blocking reason.
+   - Never skip status transitions or force a final state without evidence.
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit.tasks` first to regenerate the task list.
 
@@ -205,7 +224,9 @@ Check if `.specify/extensions.yml` exists in the project root.
 
 ## Completion Report
 
-Report final status with summary of completed work.
+Report final status with summary of completed work and the final state of the specification.
+
+If the closure conditions are met, include the automatic transition to `Implementada`; otherwise, explicitly state that the spec remains `En implementación` because of the failed checks.
 
 ## Done When
 
