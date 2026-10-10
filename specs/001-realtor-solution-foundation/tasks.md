@@ -10,10 +10,10 @@
 
 **Objetivo**: Confirmar la versión del SDK y dejar la estructura base de la solución única preparada para backend y frontend.
 
-- [ ] T001 Crear la estructura raíz de la solución en `app/` y asegurar la presencia de `app/Realtor.sln`.
-- [ ] T002 Confirmar que la versión de .NET se toma exclusivamente del archivo `global.json` y no se modifica desde esta iniciativa.
-- [ ] T003 [P] Crear la organización de carpetas de backend y frontend dentro de `app/` según la estructura definida en `plan.md`.
-- [ ] T004 [P] Registrar los proyectos base esperados en `app/backend/` y `app/frontend/` sin incorporar negocio ni features funcionales.
+- [X] T001 Crear la estructura raíz de la solución en `app/` y asegurar la presencia de `app/Realtor.sln`.
+- [X] T002 Confirmar que la versión de .NET se toma exclusivamente del archivo `global.json` y no se modifica desde esta iniciativa.
+- [X] T003 [P] Crear la organización de carpetas de backend y frontend dentro de `app/` según la estructura definida en `plan.md`.
+- [X] T004 [P] Registrar los proyectos base esperados en `app/backend/` y `app/frontend/` sin incorporar negocio ni features funcionales.
 
 **Punto de control**: La solución compartida existe, la versión del SDK está sincronizada con `global.json` y la estructura base está lista para el desarrollo real.
 
@@ -27,14 +27,14 @@
 
 ### Verificación de la historia de usuario 1
 
-- [ ] T005 [P] [US1] Validar la versión del SDK definida en `global.json` y documentar la comprobación en `quickstart.md` o equivalente.
-- [ ] T006 [P] [US1] Revisar que la estructura de carpetas cumple la regla de solución única y la jerarquía indicada en `plan.md`.
+- [X] T005 [P] [US1] Validar la versión del SDK definida en `global.json` y documentar la comprobación en `quickstart.md` o equivalente.
+- [X] T006 [P] [US1] Revisar que la estructura de carpetas cumple la regla de solución única y la jerarquía indicada en `plan.md`.
 
 ### Implementación de la historia de usuario 1
 
-- [ ] T007 [US1] Crear `app/Realtor.sln` y ajustar la solución principal para incluir los proyectos base de backend y frontend.
-- [ ] T008 [US1] Crear la estructura de carpetas para `app/backend/src/RealtorApi/`, `app/backend/tests/RealtorApiTests/`, `app/frontend/src/RealtorWeb/` y `app/frontend/test/RealtorWeb/`.
-- [ ] T009 [US1] Verificar que no se introduce lógica de negocio, entidades de dominio ni casos de uso funcionales en esta iniciativa.
+- [X] T007 [US1] Crear `app/Realtor.sln` y ajustar la solución principal para incluir los proyectos base de backend y frontend.
+- [X] T008 [US1] Crear la estructura de carpetas para `app/backend/src/RealtorApi/`, `app/backend/tests/RealtorApiTests/`, `app/frontend/src/RealtorWeb/` y `app/frontend/test/RealtorWeb/`.
+- [X] T009 [US1] Verificar que no se introduce lógica de negocio, entidades de dominio ni casos de uso funcionales en esta iniciativa.
 
 **Punto de control**: La base del repositorio queda preparada y no excede el alcance de la foundation.
 
@@ -48,15 +48,15 @@
 
 ### Verificación de la historia de usuario 2
 
-- [ ] T010 [P] [US2] Verificar que `app/backend/src/RealtorApi/` queda configurado como proyecto ASP.NET Core y no usa controladores.
-- [ ] T011 [P] [US2] Comprobar que `Program.cs` contiene solo configuración de arranque mínima (servicios, middleware y mapeo base) sin lógica funcional.
+- [X] T010 [P] [US2] Verificar que `app/backend/src/RealtorApi/` queda configurado como proyecto ASP.NET Core y no usa controladores.
+- [X] T011 [P] [US2] Comprobar que `Program.cs` contiene solo configuración de arranque mínima (servicios, middleware y mapeo base) sin lógica funcional.
 
 ### Implementación de la historia de usuario 2
 
-- [ ] T012 [US2] Crear el proyecto `app/backend/src/RealtorApi/RealtorApi.csproj` con la base del runtime ASP.NET Core Minimal API.
-- [ ] T013 [US2] Configurar `app/backend/src/RealtorApi/Program.cs` para servicios y middleware mínimos, sin endpoints funcionales ni controllers.
-- [ ] T014 [US2] Crear `app/backend/tests/RealtorApiTests/RealtorApiTests.csproj` con una base de pruebas mínima para validar el arranque del backend.
-- [ ] T015 [US2] Revisar la estructura del backend para confirmar que no existe dominio, entidades persistentes ni lógica de negocio en la base.
+- [X] T012 [US2] Crear el proyecto `app/backend/src/RealtorApi/RealtorApi.csproj` con la base del runtime ASP.NET Core Minimal API.
+- [X] T013 [US2] Configurar `app/backend/src/RealtorApi/Program.cs` para servicios y middleware mínimos, sin endpoints funcionales ni controllers.
+- [X] T014 [US2] Crear `app/backend/tests/RealtorApiTests/RealtorApiTests.csproj` con una base de pruebas mínima para validar el arranque del backend.
+- [X] T015 [US2] Revisar la estructura del backend para confirmar que no existe dominio, entidades persistentes ni lógica de negocio en la base.
 
 **Punto de control**: El backend queda preparado para crecer por vertical slices sin introducir deuda técnica inicial.
 
@@ -70,15 +70,15 @@
 
 ### Verificación de la historia de usuario 3
 
-- [ ] T016 [P] [US3] Validar que `app/frontend/src/RealtorWeb/` es un proyecto Blazor Web App con Razor Components.
-- [ ] T017 [P] [US3] Comprobar que la base del frontend no incluye pantallas ni lógica funcional de negocio.
+- [X] T016 [P] [US3] Validar que `app/frontend/src/RealtorWeb/` es un proyecto Blazor Web App con Razor Components.
+- [X] T017 [P] [US3] Comprobar que la base del frontend no incluye pantallas ni lógica funcional de negocio.
 
 ### Implementación de la historia de usuario 3
 
-- [ ] T018 [US3] Crear el proyecto `app/frontend/src/RealtorWeb/RealtorWeb.csproj` con la estructura base de Blazor Web App.
-- [ ] T019 [US3] Configurar la entrada de la aplicación en `app/frontend/src/RealtorWeb/Program.cs` y los componentes base de inicio (`App.razor`, `Routes.razor` y `Components/Pages/` si aplica) sin páginas funcionales.
-- [ ] T020 [US3] Crear `app/frontend/test/RealtorWeb/RealtorWeb.csproj` como proyecto de pruebas mínimo para la base del frontend.
-- [ ] T021 [US3] Revisar que la capa frontend se mantiene dentro del alcance de foundation y no define flujos de negocio ni features operativas.
+- [X] T018 [US3] Crear el proyecto `app/frontend/src/RealtorWeb/RealtorWeb.csproj` con la estructura base de Blazor Web App.
+- [X] T019 [US3] Configurar la entrada de la aplicación en `app/frontend/src/RealtorWeb/Program.cs` y los componentes base de inicio (`App.razor`, `Routes.razor` y `Components/Pages/` si aplica) sin páginas funcionales.
+- [X] T020 [US3] Crear `app/frontend/test/RealtorWeb/RealtorWeb.csproj` como proyecto de pruebas mínimo para la base del frontend.
+- [X] T021 [US3] Revisar que la capa frontend se mantiene dentro del alcance de foundation y no define flujos de negocio ni features operativas.
 
 **Punto de control**: El frontend queda listo para la evolución posterior con componentes y navegación, pero sin business logic en esta fase.
 
@@ -88,10 +88,10 @@
 
 **Objetivo**: Validar el alcance completo de la foundation y confirmar que la solución cumple la constitución, la spec y el plan.
 
-- [ ] T022 [P] Revisar el cumplimiento de la constitución, la spec y el plan para confirmar que no se ha excedido el alcance de foundation.
-- [ ] T023 Validar que la solución puede compilar con la versión marcada en `global.json` ejecutando `dotnet build app/Realtor.sln`.
-- [ ] T024 Revisar la documentación base (`spec.md`, `plan.md`, `quickstart.md` y `research.md`) para confirmar que el alcance queda consistente y traducido al español.
-- [ ] T025 Verificar que la solución final cumple los requisitos de la foundation: una solución única, backend Minimal API, frontend Blazor y ausencia de lógica de negocio.
+- [X] T022 [P] Revisar el cumplimiento de la constitución, la spec y el plan para confirmar que no se ha excedido el alcance de foundation.
+- [X] T023 Validar que la solución puede compilar con la versión marcada en `global.json` ejecutando `dotnet build app/Realtor.sln`.
+- [X] T024 Revisar la documentación base (`spec.md`, `plan.md`, `quickstart.md` y `research.md`) para confirmar que el alcance queda consistente y traducido al español.
+- [X] T025 Verificar que la solución final cumple los requisitos de la foundation: una solución única, backend Minimal API, frontend Blazor y ausencia de lógica de negocio.
 
 **Punto de control**: La iniciativa foundation está completa, validada y lista para que las siguientes specs definan funcionalidad real.
 
