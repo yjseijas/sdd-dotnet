@@ -8,15 +8,15 @@
 
 ## Formato: `[ID] [P?] [Historia] Descripción`
 
-- [ ] T001 ...
+- [X] T001 ...
 
 ## Fase 1: Preparación (estructura compartida)
 
 **Objetivo**: Preparar la estructura de infraestructura transversal del backend sin introducir entidades de dominio ni casos de uso de negocio.
 
-- [ ] T001 Crear la estructura base de carpetas y archivos para infraestructura transversal en `app/backend/src/RealtorApi/Infrastructure/`, `Features/` y `app/backend/tests/RealtorApiTests/`.
-- [ ] T002 Configurar `app/backend/src/RealtorApi/RealtorApi.csproj` con las referencias necesarias para ASP.NET Core Minimal APIs, FluentValidation y `ILogger`.
-- [ ] T003 [P] Configurar `app/backend/tests/RealtorApiTests/RealtorApiTests.csproj` con xUnit y referencias de prueba para la infraestructura del backend.
+- [X] T001 Crear la estructura base de carpetas y archivos para infraestructura transversal en `app/backend/src/RealtorApi/Infrastructure/`, `Features/` y `app/backend/tests/RealtorApiTests/`.
+- [X] T002 Configurar `app/backend/src/RealtorApi/RealtorApi.csproj` con las referencias necesarias para ASP.NET Core Minimal APIs, FluentValidation y `ILogger`.
+- [X] T003 [P] Configurar `app/backend/tests/RealtorApiTests/RealtorApiTests.csproj` con xUnit y referencias de prueba para la infraestructura del backend.
 
 ---
 
@@ -24,10 +24,10 @@
 
 **Objetivo**: Definir los contratos y la infraestructura compartida que habilitan el auto-descubrimiento, la validación y la representación uniforme de errores.
 
-- [ ] T004 Implementar el contrato `ISlice` y el mecanismo base para registrar endpoints en `app/backend/src/RealtorApi/Infrastructure/Endpoints/`.
-- [ ] T005 [P] Implementar los contratos `IHandler<TRequest, TResult>` y `Result<T>` en `app/backend/src/RealtorApi/Infrastructure/Handlers/` y `app/backend/src/RealtorApi/Infrastructure/Results/`.
-- [ ] T006 [P] Preparar la infraestructura de validación y logging estructurado en `app/backend/src/RealtorApi/Infrastructure/Validation/` y `app/backend/src/RealtorApi/Infrastructure/Logging/`.
-- [ ] T007 Definir el registro central de servicios y el punto de entrada de la infraestructura para `Program.cs` sin endpoints manuales ni lógica de negocio.
+- [X] T004 Implementar el contrato `ISlice` y el mecanismo base para registrar endpoints en `app/backend/src/RealtorApi/Infrastructure/Endpoints/`.
+- [X] T005 [P] Implementar los contratos `IHandler<TRequest, TResult>` y `Result<T>` en `app/backend/src/RealtorApi/Infrastructure/Handlers/` y `app/backend/src/RealtorApi/Infrastructure/Results/`.
+- [X] T006 [P] Preparar la infraestructura de validación y logging estructurado en `app/backend/src/RealtorApi/Infrastructure/Validation/` y `app/backend/src/RealtorApi/Infrastructure/Logging/`.
+- [X] T007 Definir el registro central de servicios y el punto de entrada de la infraestructura para `Program.cs` sin endpoints manuales ni lógica de negocio.
 
 **Punto de control**: La base está lista para que las historias de usuario puedan depender de los contratos compartidos.
 
@@ -41,14 +41,14 @@
 
 ### Verificación de la historia de usuario 1
 
-- [ ] T008 [P] [US1] Añadir pruebas unitarias para el descubrimiento de `ISlice` y la ausencia de duplicados en `app/backend/tests/RealtorApiTests/Infrastructure/SliceDiscoveryTests.cs`.
-- [ ] T009 [P] [US1] Añadir pruebas unitarias para la sonda `/health` en `app/backend/tests/RealtorApiTests/Infrastructure/HealthEndpointTests.cs`.
+- [X] T008 [P] [US1] Añadir pruebas unitarias para el descubrimiento de `ISlice` y la ausencia de duplicados en `app/backend/tests/RealtorApiTests/Infrastructure/SliceDiscoveryTests.cs`.
+- [X] T009 [P] [US1] Añadir pruebas unitarias para la sonda `/health` en `app/backend/tests/RealtorApiTests/Infrastructure/HealthEndpointTests.cs`.
 
 ### Implementación de la historia de usuario 1
 
-- [ ] T010 [P] [US1] Implementar el registrador y descubridor de slices en `app/backend/src/RealtorApi/Infrastructure/Endpoints/SliceRegistry.cs` y archivos asociados.
-- [ ] T011 [US1] Implementar la sonda `/health` como slice en `app/backend/src/RealtorApi/Infrastructure/Health/HealthSlice.cs`.
-- [ ] T012 [US1] Ajustar `app/backend/src/RealtorApi/Program.cs` para registrar la infraestructura y mapear automáticamente los endpoints descubiertos sin endpoints manuales.
+- [X] T010 [P] [US1] Implementar el registrador y descubridor de slices en `app/backend/src/RealtorApi/Infrastructure/Endpoints/SliceRegistry.cs` y archivos asociados.
+- [X] T011 [US1] Implementar la sonda `/health` como slice en `app/backend/src/RealtorApi/Infrastructure/Health/HealthSlice.cs`.
+- [X] T012 [US1] Ajustar `app/backend/src/RealtorApi/Program.cs` para registrar la infraestructura y mapear automáticamente los endpoints descubiertos sin endpoints manuales.
 
 **Punto de control**: El sistema puede incorporar un endpoint nuevo sin modificar el arranque central ni mantener una lista estática.
 
@@ -62,14 +62,14 @@
 
 ### Verificación de la historia de usuario 2
 
-- [ ] T013 [P] [US2] Añadir pruebas unitarias para auto-registro de handlers y validación automática en `app/backend/tests/RealtorApiTests/Infrastructure/HandlerAndValidationTests.cs`.
-- [ ] T014 [P] [US2] Añadir pruebas unitarias para el caso sin validator y el manejo de errores `ValidationProblemDetails` en `app/backend/tests/RealtorApiTests/Infrastructure/ValidationFilterTests.cs`.
+- [X] T013 [P] [US2] Añadir pruebas unitarias para auto-registro de handlers y validación automática en `app/backend/tests/RealtorApiTests/Infrastructure/HandlerAndValidationTests.cs`.
+- [X] T014 [P] [US2] Añadir pruebas unitarias para el caso sin validator y el manejo de errores `ValidationProblemDetails` en `app/backend/tests/RealtorApiTests/Infrastructure/ValidationFilterTests.cs`.
 
 ### Implementación de la historia de usuario 2
 
-- [ ] T015 [P] [US2] Implementar el registro automático de handlers concretos en `app/backend/src/RealtorApi/Infrastructure/Handlers/HandlerRegistry.cs`.
-- [ ] T016 [US2] Implementar el filtro de validación por tipo con `ValidationFilterFactory` o equivalente en `app/backend/src/RealtorApi/Infrastructure/Validation/ValidationFilter.cs`.
-- [ ] T017 [US2] Configurar el descubrimiento automático de validators y la respuesta HTTP 400 con `ValidationProblemDetails` en `app/backend/src/RealtorApi/Infrastructure/Validation/`.
+- [X] T015 [P] [US2] Implementar el registro automático de handlers concretos en `app/backend/src/RealtorApi/Infrastructure/Handlers/HandlerRegistry.cs`.
+- [X] T016 [US2] Implementar el filtro de validación por tipo con `ValidationFilterFactory` o equivalente en `app/backend/src/RealtorApi/Infrastructure/Validation/ValidationFilter.cs`.
+- [X] T017 [US2] Configurar el descubrimiento automático de validators y la respuesta HTTP 400 con `ValidationProblemDetails` en `app/backend/src/RealtorApi/Infrastructure/Validation/`.
 
 **Punto de control**: Las solicitudes con validator aplicable se rechazan correctamente; las que no tienen validator continúan su flujo normal.
 
@@ -83,13 +83,13 @@
 
 ### Verificación de la historia de usuario 3
 
-- [ ] T018 [P] [US3] Añadir pruebas unitarias para la conversión de `Result` a `ProblemDetails` y el logging estructurado en `app/backend/tests/RealtorApiTests/Infrastructure/ResultAndLoggingTests.cs`.
+- [X] T018 [P] [US3] Añadir pruebas unitarias para la conversión de `Result` a `ProblemDetails` y el logging estructurado en `app/backend/tests/RealtorApiTests/Infrastructure/ResultAndLoggingTests.cs`.
 
 ### Implementación de la historia de usuario 3
 
-- [ ] T019 [US3] Implementar la conversión centralizada de errores esperados a `ProblemDetails` en `app/backend/src/RealtorApi/Infrastructure/Results/ResultProblemDetailsMapper.cs`.
-- [ ] T020 [US3] Implementar el helper de logging estructurado en `app/backend/src/RealtorApi/Infrastructure/Logging/StructuredLoggerExtensions.cs`.
-- [ ] T021 [US3] Asegurar que los componentes lógicos de infraestructura usen `ILogger` con propiedades estructuradas y no interpolación textual como único mecanismo de diagnóstico.
+- [X] T019 [US3] Implementar la conversión centralizada de errores esperados a `ProblemDetails` en `app/backend/src/RealtorApi/Infrastructure/Results/ResultProblemDetailsMapper.cs`.
+- [X] T020 [US3] Implementar el helper de logging estructurado en `app/backend/src/RealtorApi/Infrastructure/Logging/StructuredLoggerExtensions.cs`.
+- [X] T021 [US3] Asegurar que los componentes lógicos de infraestructura usen `ILogger` con propiedades estructuradas y no interpolación textual como único mecanismo de diagnóstico.
 
 **Punto de control**: Los errores esperados mantienen su código y detalle HTTP, y la infraestructura ofrece logging diagnósticos estructurados.
 
@@ -99,10 +99,10 @@
 
 **Objetivo**: Validar que la iniciativa cumple la especificación, la gobernanza y la verificación de la solución.
 
-- [ ] T022 [P] Revisar la documentación de `specs/002-foundation-backend/` para confirmar que el alcance sigue limitado a infraestructura y no incluye entidades ni casos de uso de negocio.
-- [ ] T023 Ejecutar `dotnet build app/Realtor.sln` para verificar compilación con el SDK de `global.json`.
-- [ ] T024 Ejecutar `dotnet test app/backend/tests/RealtorApiTests/RealtorApiTests.csproj` para confirmar que la infraestructura de endpoints, validación y errores cumple las pruebas unitarias.
-- [ ] T025 Verificar la conformidad constitucional: sin controllers, sin `AppDbContext`, sin migraciones, sin registros manuales de endpoints y con `/health` sin autenticación de aplicación.
+- [X] T022 [P] Revisar la documentación de `specs/002-foundation-backend/` para confirmar que el alcance sigue limitado a infraestructura y no incluye entidades ni casos de uso de negocio.
+- [X] T023 Ejecutar `dotnet build app/Realtor.sln` para verificar compilación con el SDK de `global.json`.
+- [X] T024 Ejecutar `dotnet test app/backend/tests/RealtorApiTests/RealtorApiTests.csproj` para confirmar que la infraestructura de endpoints, validación y errores cumple las pruebas unitarias.
+- [X] T025 Verificar la conformidad constitucional: sin controllers, sin `AppDbContext`, sin migraciones, sin registros manuales de endpoints y con `/health` sin autenticación de aplicación.
 
 ---
 
