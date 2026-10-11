@@ -1,0 +1,14 @@
+[
+  {
+    "value": "Available",
+    "description": "La propiedad está disponible para renta"
+  },
+  {
+    "value": "Rented",
+    "description": "La propiedad tiene un inquilino activo"
+  },
+  {
+    "value": "Maintenance",
+    "description": "La propiedad está fuera de servicio temporalmente"
+  }
+]
