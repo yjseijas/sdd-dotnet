@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Realtor seed manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "propertiesFile", "statusFile", "assets"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Versión del manifiesto de seed."
+    },
+    "propertiesFile": {
+      "type": "string",
+      "description": "Ruta relativa al JSON de propiedades iniciales."
+    },
+    "statusFile": {
+      "type": "string",
+      "description": "Ruta relativa al JSON de estados posibles de la propiedad."
+    },
+    "assets": {
+      "type": "array",
+      "description": "Activos externos a publicar y hacer accesibles en runtime.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "target", "publicPath"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Ruta origen dentro del repositorio o del proyecto."
+          },
+          "target": {
+            "type": "string",
+            "description": "Ruta final dentro de la publicación de la aplicación."
+          },
+          "publicPath": {
+            "type": "string",
+            "description": "Ruta pública servida por la API o por el host web."
+          }
+        }
+      }
+    }
+  }
+}
