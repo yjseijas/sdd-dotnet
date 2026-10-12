@@ -4,7 +4,7 @@
 
 **Creada**: 2026-10-11
 
-**Estado**: Borrador
+**Estado**: Implemented
 
 > El estado de la especificación se modifica automáticamente del flujo Speckit: Borrador → Aprobada → En implementación → Implementada. No editarlo manualmente fuera de ese flujo.
 
