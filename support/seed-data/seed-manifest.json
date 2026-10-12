@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "propertiesFile": "support/seed-data/properties.json",
+  "statusFile": "support/seed-data/properties.statuses.json",
+  "assets": [
+    { "source": "support/seed-data/images/properties/1.png", "target": "wwwroot/images/properties/1.png", "publicPath": "/images/properties/1.png" },
+    { "source": "support/seed-data/images/properties/2.png", "target": "wwwroot/images/properties/2.png", "publicPath": "/images/properties/2.png" },
+    { "source": "support/seed-data/images/properties/3.png", "target": "wwwroot/images/properties/3.png", "publicPath": "/images/properties/3.png" },
+    { "source": "support/seed-data/images/properties/4.png", "target": "wwwroot/images/properties/4.png", "publicPath": "/images/properties/4.png" },
+    { "source": "support/seed-data/images/properties/5.png", "target": "wwwroot/images/properties/5.png", "publicPath": "/images/properties/5.png" },
+    { "source": "support/seed-data/images/properties/6.png", "target": "wwwroot/images/properties/6.png", "publicPath": "/images/properties/6.png" },
+    { "source": "support/seed-data/images/properties/7.png", "target": "wwwroot/images/properties/7.png", "publicPath": "/images/properties/7.png" },
+    { "source": "support/seed-data/images/properties/8.png", "target": "wwwroot/images/properties/8.png", "publicPath": "/images/properties/8.png" },
+    { "source": "support/seed-data/images/properties/9.png", "target": "wwwroot/images/properties/9.png", "publicPath": "/images/properties/9.png" },
+    { "source": "support/seed-data/images/properties/10.png", "target": "wwwroot/images/properties/10.png", "publicPath": "/images/properties/10.png" }
+  ]
+}

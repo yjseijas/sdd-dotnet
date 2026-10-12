@@ -4,7 +4,7 @@
 
 **Creada**: 2026-10-11
 
-**Estado**: Implemented
+**Estado**: Implementada
 
 > El estado de la especificación se modifica automáticamente del flujo Speckit: Borrador → Aprobada → En implementación → Implementada. No editarlo manualmente fuera de ese flujo.
 
@@ -107,3 +107,4 @@ Los equipos de producto y consulta necesitan que la información de propiedades 
 - Los datos de ejemplo y los archivos externos se alojan en un directorio de soporte del repositorio y deben resolverse desde un manifiesto central para mantener consistencia con el runtime.
 - La ruta pública de la imagen debe coincidir con la forma de servir activos desde la aplicación y no debe depender de rutas de trabajo locales del desarrollador.
 - La migración y el seeding deben ser idempotentes para soportar reinicios recurrentes de la aplicación y validaciones automáticas de la infraestructura.
+
