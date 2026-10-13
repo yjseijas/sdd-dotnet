@@ -10,6 +10,12 @@
 
 **Entrada**: Descripción del usuario: "Crear la especificación 004-properties-list-pagination. Definir un listado paginado de propiedades con imágenes públicas absolutas, ordenado por título, con validación y metadatos de paginación."
 
+## Clarificaciones
+
+### Sesión 2026-10-13
+
+- Q: ¿Debe existir un tamaño máximo para `pageSize`? → A: Sí; el máximo es 100.
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 ### Historia de usuario 1: Consultar el catálogo paginado (Prioridad: P1)
@@ -32,11 +38,11 @@ Quiero recibir un error de validación comprensible cuando solicite una página 
 
 **Motivo de prioridad**: La validación evita solicitudes de paginación sin sentido y hace explícitos los errores de entrada.
 
-**Prueba independiente**: Enviar valores no enteros o valores menores o iguales a cero para `page` o `pageSize` y comprobar que cada solicitud inválida se rechaza con estado 400 y detalles de validación.
+**Prueba independiente**: Enviar valores no enteros o fuera de los rangos permitidos para `page` y `pageSize` y comprobar que cada solicitud inválida se rechaza con estado 400 y detalles de validación.
 
 **Escenarios de aceptación**:
 
-1. **Dado** que `page` o `pageSize` es cero, negativo o no representa un entero válido, **Cuando** solicito el listado, **Entonces** recibo una respuesta 400 con detalles de validación.
+1. **Dado** que `page` o `pageSize` no es un entero válido, `page` es menor o igual a cero, o `pageSize` está fuera del rango de 1 a 100, **Cuando** solicito el listado, **Entonces** recibo una respuesta 400 con detalles de validación.
 2. **Dado** que solicito una página posterior a la última disponible, **Cuando** consulto el listado, **Entonces** recibo una página vacía con metadatos coherentes y sin error de servidor.
 
 ### Casos límite
@@ -45,6 +51,7 @@ Quiero recibir un error de validación comprensible cuando solicite una página 
 - Si la página solicitada supera la última página, devuelve una colección vacía; `hasPrevious` refleja si la página indicada es posterior a la primera y `hasNext` es falso.
 - Si falta alguno de los parámetros, se aplica su valor predeterminado de manera independiente.
 - Si una consulta contiene un parámetro de paginación que no sea un entero positivo, se rechaza con estado 400 y un detalle asociado al valor inválido.
+- Si `pageSize` es mayor que 100, se rechaza con estado 400 y un detalle de validación.
 - Si varias propiedades comparten título, se ordenan por identificador ascendente como desempate para mantener un orden estable entre páginas.
 
 ## Requisitos *(obligatorio)*
@@ -52,8 +59,8 @@ Quiero recibir un error de validación comprensible cuando solicite una página 
 ### Requisitos funcionales
 
 - **RF-001**: El sistema DEBE ofrecer el listado de propiedades en `GET /api/properties`.
-- **RF-002**: El sistema DEBE aceptar los parámetros de consulta `page` y `pageSize`, usando de forma independiente los valores predeterminados 1 y 6 cuando no se proporcionen.
-- **RF-003**: El sistema DEBE rechazar con estado HTTP 400 y detalles `ProblemDetails` o `ValidationProblemDetails` los valores de paginación que no sean enteros positivos.
+- **RF-002**: El sistema DEBE aceptar los parámetros de consulta `page` y `pageSize`, usando de forma independiente los valores predeterminados 1 y 6 cuando no se proporcionen. `pageSize` DEBE estar entre 1 y 100, inclusive.
+- **RF-003**: El sistema DEBE rechazar con estado HTTP 400 y detalles `ProblemDetails` o `ValidationProblemDetails` los valores de paginación que no sean enteros válidos positivos o, para `pageSize`, mayores que 100.
 - **RF-004**: El sistema DEBE ordenar las propiedades por título ascendente; cuando los títulos coincidan, DEBE usar el identificador ascendente como desempate.
 - **RF-005**: Cada elemento del listado DEBE incluir al menos `id`, `title`, `description`, `address`, `price`, `status`, `bedroomCount`, `bathroomCount`, `areaSquareMeters` e `imageUrl`, sin exponer directamente la entidad persistente.
 - **RF-006**: Cada `imageUrl` DEBE ser una URL absoluta pública servida por la aplicación, con el formato `http(s)://{host}/assets/properties/{fileName}`; no DEBE exponer rutas físicas internas ni devolver una ruta relativa.
@@ -74,13 +81,13 @@ Quiero recibir un error de validación comprensible cuando solicite una página 
 - **CE-001**: Sin parámetros, el 100 % de las consultas válidas devuelve la primera página, con hasta 6 propiedades ordenadas por título ascendente.
 - **CE-002**: Para un conjunto de 13 propiedades con tamaño de página 6, las tres páginas contienen 6, 6 y 1 propiedades respectivamente, y los metadatos reflejan 13 elementos y 3 páginas.
 - **CE-003**: El 100 % de los elementos devueltos incluye una URL de imagen absoluta con host y esquema de la solicitud, sin rutas internas ni relativas.
-- **CE-004**: El 100 % de las consultas con valores de paginación no enteros o menores o iguales a cero recibe estado 400 y detalles de validación.
+- **CE-004**: El 100 % de las consultas con valores de paginación no enteros o fuera del rango permitido (`page` menor o igual a cero; `pageSize` menor o igual a cero o mayor que 100) recibe estado 400 y detalles de validación.
 - **CE-005**: Una página fuera del rango disponible devuelve cero elementos y metadatos coherentes, sin provocar un error de servidor.
 
 ## Supuestos
 
 - La entidad persistente, los datos de propiedades y los assets públicos se definen en iniciativas previas; esta funcionalidad solo los consulta y no cambia el esquema persistente.
-- `page` y `pageSize` deben ser enteros positivos. No se establece un máximo adicional para `pageSize` en esta especificación.
+- `page` debe ser un entero positivo y `pageSize` un entero entre 1 y 100.
 - Los estados se representan conforme al contrato del modelo persistente vigente.
 - Las URL de imagen se construyen con el esquema y el host de la solicitud recibida, y las imágenes referenciadas ya están publicadas bajo `/assets/properties/`.
 - Cuando dos propiedades comparten título, el identificador se utiliza como criterio secundario de orden ascendente.
