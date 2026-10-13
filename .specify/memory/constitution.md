@@ -17,13 +17,16 @@ Informe de impacto de sincronización
   inicial de esta constitución.
 -->
 <!--
-Sync Impact Report
-- Version change: 1.0.0 → 1.1.0
-- Modified principles: added operational governance for spec lifecycle.
-- Added sections: Ciclo de estado de specs.
-- Removed sections: none.
-- Templates requiring updates: ✅ .specify/templates/spec-template.md updated; ✅ .github/agents/speckit.implement.agent.md updated.
-- Follow-up TODOs: none.
+Informe de impacto de sincronización
+- Cambio de versión: 1.1.0 → 1.2.0.
+- Principios modificados: se permite el checklist de calidad generado durante
+  speckit.specify como artefacto adicional controlado.
+- Secciones modificadas: Método de Trabajo; se mantiene el conjunto canónico de
+  spec.md, plan.md y tasks.md y se define una excepción limitada para
+  checklists/requirements.md.
+- Secciones eliminadas: ninguna.
+- Plantillas: no requieren cambios para esta enmienda.
+- Pendientes: ninguno.
 -->
 
 # Constitución del Proyecto Realtor
@@ -114,11 +117,17 @@ La carpeta .specify se reserva para infraestructura operativa de spec-kit.
 
 ## Método de Trabajo
 
-Cada iniciativa DEBE contener exactamente tres archivos:
+Cada iniciativa DEBE contener estos tres archivos canónicos:
 
 - spec.md
 - plan.md
 - tasks.md
+
+Durante la fase `speckit.specify` se permite además crear
+`checklists/requirements.md` para validar la calidad de la especificación.
+Este checklist es el único artefacto adicional permitido por esta excepción;
+no sustituye ni modifica los tres archivos canónicos y no autoriza otros
+archivos auxiliares dentro de la iniciativa.
 
 Antes de implementar:
 
@@ -265,4 +274,4 @@ Está prohibido al agente mover archivos por iniciativa propia, renombrar carpet
 La única resolución legítima es la decisión humana documentada vía enmienda constitucional o ajuste explícito de convención local.
 
 
-**Versión**: 1.1.0 | **Ratificada**: 2026-10-05 | **Última enmienda**: 2026-10-10
+**Versión**: 1.2.0 | **Ratificada**: 2026-10-05 | **Última enmienda**: 2026-10-13
