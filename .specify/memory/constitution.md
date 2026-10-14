@@ -18,14 +18,14 @@ Informe de impacto de sincronización
 -->
 <!--
 Informe de impacto de sincronización
-- Cambio de versión: 1.1.0 → 1.2.0.
-- Principios modificados: se permite el checklist de calidad generado durante
-  speckit.specify como artefacto adicional controlado.
+- Cambio de versión: 1.2.0 → 1.3.0.
+- Principios modificados: se permiten artefactos de diseño generados durante
+  speckit.plan, además del checklist de calidad de speckit.specify.
 - Secciones modificadas: Método de Trabajo; se mantiene el conjunto canónico de
-  spec.md, plan.md y tasks.md y se define una excepción limitada para
-  checklists/requirements.md.
+  spec.md, plan.md y tasks.md y se enumeran los artefactos auxiliares permitidos
+  por las fases specify y plan.
 - Secciones eliminadas: ninguna.
-- Plantillas: no requieren cambios para esta enmienda.
+- Plantillas: alineadas con los artefactos documentales de speckit.plan.
 - Pendientes: ninguno.
 -->
 
@@ -125,9 +125,12 @@ Cada iniciativa DEBE contener estos tres archivos canónicos:
 
 Durante la fase `speckit.specify` se permite además crear
 `checklists/requirements.md` para validar la calidad de la especificación.
-Este checklist es el único artefacto adicional permitido por esta excepción;
-no sustituye ni modifica los tres archivos canónicos y no autoriza otros
-archivos auxiliares dentro de la iniciativa.
+Durante la fase `speckit.plan` se permite crear `research.md`,
+`data-model.md`, `quickstart.md` y los contratos relacionados dentro de
+`contracts/`. Estos artefactos solo pueden crearse cuando correspondan a la
+fase y al alcance de la iniciativa. Ninguno sustituye ni modifica los tres
+archivos canónicos, y no se autorizan otros archivos auxiliares por estas
+excepciones.
 
 Antes de implementar:
 
@@ -274,4 +277,4 @@ Está prohibido al agente mover archivos por iniciativa propia, renombrar carpet
 La única resolución legítima es la decisión humana documentada vía enmienda constitucional o ajuste explícito de convención local.
 
 
-**Versión**: 1.2.0 | **Ratificada**: 2026-10-05 | **Última enmienda**: 2026-10-13
+**Versión**: 1.3.0 | **Ratificada**: 2026-10-05 | **Última enmienda**: 2026-10-13

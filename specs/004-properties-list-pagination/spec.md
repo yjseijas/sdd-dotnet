@@ -15,6 +15,8 @@
 ### Sesión 2026-10-13
 
 - Q: ¿Debe existir un tamaño máximo para `pageSize`? → A: Sí; el máximo es 100.
+- Q: ¿Qué propiedad contiene la colección en la respuesta JSON? → A: `items`, al mismo nivel que los metadatos de paginación.
+- Q: ¿Cómo se serializa `status`? → A: Como texto con los nombres del enum (`Available`, `Rented`, `Maintenance`).
 
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
@@ -62,10 +64,10 @@ Quiero recibir un error de validación comprensible cuando solicite una página 
 - **RF-002**: El sistema DEBE aceptar los parámetros de consulta `page` y `pageSize`, usando de forma independiente los valores predeterminados 1 y 6 cuando no se proporcionen. `pageSize` DEBE estar entre 1 y 100, inclusive.
 - **RF-003**: El sistema DEBE rechazar con estado HTTP 400 y detalles `ProblemDetails` o `ValidationProblemDetails` los valores de paginación que no sean enteros válidos positivos o, para `pageSize`, mayores que 100.
 - **RF-004**: El sistema DEBE ordenar las propiedades por título ascendente; cuando los títulos coincidan, DEBE usar el identificador ascendente como desempate.
-- **RF-005**: Cada elemento del listado DEBE incluir al menos `id`, `title`, `description`, `address`, `price`, `status`, `bedroomCount`, `bathroomCount`, `areaSquareMeters` e `imageUrl`, sin exponer directamente la entidad persistente.
+- **RF-005**: Cada elemento del listado DEBE incluir al menos `id`, `title`, `description`, `address`, `price`, `status`, `bedroomCount`, `bathroomCount`, `areaSquareMeters` e `imageUrl`, sin exponer directamente la entidad persistente. `status` DEBE serializarse como texto con los nombres del enum (`Available`, `Rented` o `Maintenance`).
 - **RF-006**: Cada `imageUrl` DEBE ser una URL absoluta pública servida por la aplicación, con el formato `http(s)://{host}/assets/properties/{fileName}`; no DEBE exponer rutas físicas internas ni devolver una ruta relativa.
 - **RF-007**: El sistema DEBE construir `imageUrl` utilizando el esquema y el host de la solicitud actual.
-- **RF-008**: La respuesta DEBE incluir los metadatos `page`, `pageSize`, `totalItems`, `totalPages`, `hasNext` y `hasPrevious`, consistentes con el resultado y el total de propiedades. `totalPages` DEBE ser el redondeo hacia arriba de `totalItems / pageSize` (cero si no hay elementos); `hasNext` DEBE indicar si `page < totalPages` y `hasPrevious` si `page > 1`.
+- **RF-008**: La respuesta DEBE incluir la colección de propiedades bajo `items` y los metadatos `page`, `pageSize`, `totalItems`, `totalPages`, `hasNext` y `hasPrevious` al mismo nivel, consistentes con el resultado y el total de propiedades. `totalPages` DEBE ser el redondeo hacia arriba de `totalItems / pageSize` (cero si no hay elementos); `hasNext` DEBE indicar si `page < totalPages` y `hasPrevious` si `page > 1`.
 - **RF-009**: El sistema DEBE propagar la cancelación de la solicitud durante la obtención y composición de los resultados.
 - **RF-010**: `app/backend/src/RealtorApi/RealtorApi.http` DEBE incluir ejemplos para `GET /api/properties` y `GET /api/properties?page=1&pageSize=6`.
 
