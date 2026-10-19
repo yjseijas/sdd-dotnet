@@ -129,7 +129,7 @@ public static class DatabaseSeeder
             return match.PublicPath;
         }
 
-        return "/images/properties/" + fileName;
+        return "/assets/properties/" + fileName;
     }
 
     private static string ResolveSeedFilePath(string relativePath)

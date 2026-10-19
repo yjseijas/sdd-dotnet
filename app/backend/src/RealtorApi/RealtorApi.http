@@ -1,0 +1,15 @@
+### Get properties default
+GET https://localhost:5001/api/properties
+Accept: application/json
+
+### Get properties page 1 sized 6
+GET https://localhost:5001/api/properties?page=1&pageSize=6
+Accept: application/json
+
+### Get properties page 2 sized 6
+GET https://localhost:5001/api/properties?page=2&pageSize=6
+Accept: application/json
+
+### Get properties invalid page size
+GET https://localhost:5001/api/properties?page=1&pageSize=101
+Accept: application/json

@@ -45,9 +45,17 @@ builder.Services.AddHandlers(typeof(Program).Assembly);
 
 var app = builder.Build();
 
+var seedImagesFolder = Path.Combine(AppContext.BaseDirectory, "support", "seed-data", "images");
+
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(AppContext.BaseDirectory, "support", "seed-data", "images")),
+    FileProvider = new PhysicalFileProvider(seedImagesFolder),
+    RequestPath = "/assets"
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(seedImagesFolder),
     RequestPath = "/images"
 });
 

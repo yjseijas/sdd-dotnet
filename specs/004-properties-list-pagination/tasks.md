@@ -8,15 +8,14 @@
 
 ## Formato de tareas
 
-- [ ] T001 [P] ...
-- [ ] T002 [US1] ...
+Las tareas usan identificadores secuenciales `Tnnn` y pueden incluir marcadores de paralelismo o de historia de usuario.
 
 ## Fase 1: Preparación y alineación del alcance
 
 **Objetivo**: Confirmar la estructura del backend, los contratos de la paginación y los archivos a modificar para la feature.
 
-- [ ] T001 [P] Revisar `spec.md`, `plan.md`, `research.md`, `data-model.md`, `quickstart.md` y `contracts/README.md` para confirmar los requisitos de `GET /api/properties`, la validación de `page`/`pageSize`, el orden por título y la generación de `imageUrl` en `app/backend/src/RealtorApi/`.
-- [ ] T002 [P] Confirmar la estructura de carpetas del backend y los puntos de extensión del proyecto (`app/backend/src/RealtorApi/Features/Properties/`, `Infrastructure/Validation/`, `Program.cs`, `RealtorApiTests/`) para implementar la feature sin tocar otras capas no requeridas.
+- [X] T001 [P] Revisar `spec.md`, `plan.md`, `research.md`, `data-model.md`, `quickstart.md` y `contracts/README.md` para confirmar los requisitos de `GET /api/properties`, la validación de `page`/`pageSize`, el orden por título y la generación de `imageUrl` en `app/backend/src/RealtorApi/`.
+- [X] T002 [P] Confirmar la estructura de carpetas del backend y los puntos de extensión del proyecto (`app/backend/src/RealtorApi/Features/Properties/`, `Infrastructure/Validation/`, `Program.cs`, `RealtorApiTests/`) para implementar la feature sin tocar otras capas no requeridas.
 
 ---
 
@@ -24,11 +23,11 @@
 
 **Objetivo**: Preparar los contratos y la lógica base de la consulta para que la API pueda paginar propiedades, ordenar resultados y construir URLs públicas.
 
-- [ ] T003 [US1] Crear el request y el validador del catálogo en `app/backend/src/RealtorApi/Features/Properties/GetPropertiesRequest.cs` y `app/backend/src/RealtorApi/Features/Properties/GetPropertiesValidator.cs`, con validación para `page` > 0 y `pageSize` en rango 1..100.
-- [ ] T004 [US1] Crear los DTO de respuesta en `app/backend/src/RealtorApi/Features/Properties/GetPropertiesResponse.cs`, incluyendo `PropertySummaryResponse` y `PaginatedPropertiesResponse` con `page`, `pageSize`, `totalItems`, `totalPages`, `hasNext`, `hasPrevious` e `items`.
-- [ ] T005 [US1] Crear la consulta de dominio en `app/backend/src/RealtorApi/Features/Properties/GetPropertiesQuery.cs` para ejecutar la búsqueda en `AppDbContext`, ordenar por `Title` ascendente y `Id` ascendente y calcular el total de elementos.
-- [ ] T006 [US1] Implementar el slice del endpoint en `app/backend/src/RealtorApi/Features/Properties/PropertiesSlice.cs` con `GET /api/properties`, aplicando la validación del request y devolviendo la respuesta paginada con `IResult`.
-- [ ] T007 [US1] Ajustar la composición de `imageUrl` en la capa de consulta para construir una URL absoluta pública con esquema y host actuales, asegurando el formato `http(s)://{host}/assets/properties/{fileName}` y sin exponer rutas físicas internas.
+- [X] T003 [US1] Crear el request y el validador del catálogo en `app/backend/src/RealtorApi/Features/Properties/GetPropertiesRequest.cs` y `app/backend/src/RealtorApi/Features/Properties/GetPropertiesValidator.cs`, con validación para `page` > 0 y `pageSize` en rango 1..100.
+- [X] T004 [US1] Crear los DTO de respuesta en `app/backend/src/RealtorApi/Features/Properties/GetPropertiesResponse.cs`, incluyendo `PropertySummaryResponse` y `PaginatedPropertiesResponse` con `page`, `pageSize`, `totalItems`, `totalPages`, `hasNext`, `hasPrevious` e `items`.
+- [X] T005 [US1] Crear la consulta de dominio en `app/backend/src/RealtorApi/Features/Properties/GetPropertiesQuery.cs` para ejecutar la búsqueda en `AppDbContext`, ordenar por `Title` ascendente y `Id` ascendente y calcular el total de elementos.
+- [X] T006 [US1] Implementar el slice del endpoint en `app/backend/src/RealtorApi/Features/Properties/PropertiesSlice.cs` con `GET /api/properties`, aplicando la validación del request y devolviendo la respuesta paginada con `IResult`.
+- [X] T007 [US1] Ajustar la composición de `imageUrl` en la capa de consulta para construir una URL absoluta pública con esquema y host actuales, asegurando el formato `http(s)://{host}/assets/properties/{fileName}` y sin exponer rutas físicas internas.
 
 **Punto de control**: La consulta paginada está integrada y responde con los datos requeridos por la especificación, sin exponer la entidad persistente.
 
@@ -42,13 +41,13 @@
 
 ### Verificación de la historia de usuario 1
 
-- [ ] T008 [P] [US1] Crear pruebas del caso feliz en `app/backend/tests/RealtorApiTests/Properties/GetPropertiesTests.cs` para validar la primera página por defecto, la segunda página con `pageSize=6` y la ordenación por `Title` + `Id`.
-- [ ] T009 [P] [US1] Ejecutar las pruebas del caso feliz para comprobar `totalItems`, `totalPages`, `hasNext`, `hasPrevious` y la composición de `imageUrl` con el host actual.
+- [X] T008 [P] [US1] Crear pruebas del caso feliz en `app/backend/tests/RealtorApiTests/Properties/GetPropertiesTests.cs` para validar la primera página por defecto, la segunda página con `pageSize=6` y la ordenación por `Title` + `Id`.
+- [X] T009 [P] [US1] Ejecutar las pruebas del caso feliz para comprobar `totalItems`, `totalPages`, `hasNext`, `hasPrevious` y la composición de `imageUrl` con el host actual.
 
 ### Implementación de la historia de usuario 1
 
-- [ ] T010 [US1] Integrar la consulta con `AppDbContext` y el patrón del proyecto para reutilizar la infraestructura existente de slices y validación automática en `app/backend/src/RealtorApi/Program.cs` y `app/backend/src/RealtorApi/Infrastructure/Validation/ValidationFilterFactory.cs`.
-- [ ] T011 [US1] Confirmar que la respuesta devuelva una colección vacía y metadatos coherentes cuando la página supera el rango disponible, sin error de servidor, según los requisitos de la spec.
+- [X] T010 [US1] Integrar la consulta con `AppDbContext` y el patrón del proyecto para reutilizar la infraestructura existente de slices y validación automática en `app/backend/src/RealtorApi/Program.cs` y `app/backend/src/RealtorApi/Infrastructure/Validation/ValidationFilterFactory.cs`.
+- [X] T011 [US1] Confirmar que la respuesta devuelva una colección vacía y metadatos coherentes cuando la página supera el rango disponible, sin error de servidor, según los requisitos de la spec.
 
 **Punto de control**: La historia 1 cumple los criterios del catálogo paginado con imágenes públicas absolutas y un orden estable.
 
@@ -62,13 +61,13 @@
 
 ### Verificación de la historia de usuario 2
 
-- [ ] T012 [P] [US2] Crear pruebas de validación en `app/backend/tests/RealtorApiTests/Properties/GetPropertiesTests.cs` para `page` no entero, `page` <= 0, `pageSize` <= 0, `pageSize` > 100 y una página fuera del rango.
-- [ ] T013 [P] [US2] Ejecutar las pruebas de validación y confirmar que cada caso inválido responde con `400 Bad Request` y `ValidationProblemDetails` o `ProblemDetails` del backend base.
+- [X] T012 [P] [US2] Crear pruebas de validación en `app/backend/tests/RealtorApiTests/Properties/GetPropertiesTests.cs` para `page` no entero, `page` <= 0, `pageSize` <= 0, `pageSize` > 100 y una página fuera del rango.
+- [X] T013 [P] [US2] Ejecutar las pruebas de validación y confirmar que cada caso inválido responde con `400 Bad Request` y `ValidationProblemDetails` o `ProblemDetails` del backend base.
 
 ### Implementación de la historia de usuario 2
 
-- [ ] T014 [US2] Ajustar la validación del request para distinguir casos no enteros, valores nulos o fuera de rango y devolver mensajes específicos para `page` y `pageSize` en `app/backend/src/RealtorApi/Features/Properties/GetPropertiesValidator.cs`.
-- [ ] T015 [US2] Revisar la ruta `GET /api/properties` en `PropertiesSlice.cs` para que una página fuera del rango devuelva `200` con colección vacía y metadatos coherentes, sin transformar el caso en error de servidor.
+- [X] T014 [US2] Ajustar la validación del request para distinguir casos no enteros, valores nulos o fuera de rango y devolver mensajes específicos para `page` y `pageSize` en `app/backend/src/RealtorApi/Features/Properties/GetPropertiesValidator.cs`.
+- [X] T015 [US2] Revisar la ruta `GET /api/properties` en `PropertiesSlice.cs` para que una página fuera del rango devuelva `200` con colección vacía y metadatos coherentes, sin transformar el caso en error de servidor.
 
 **Punto de control**: La validación y el tratamiento de páginas fuera de rango cumplen la expectativa de UX y error del backend.
 
@@ -78,11 +77,11 @@
 
 **Objetivo**: Completar la documentación de uso y verificar la feature conforme al plan y la guía rápida.
 
-- [ ] T016 [P] Crear y actualizar ejemplos de consulta para `GET /api/properties` y `GET /api/properties?page=1&pageSize=6` en `app/backend/src/RealtorApi/RealtorApi.http` para reflejar la API pública de la feature.
-- [ ] T017 [P] Revisar `specs/004-properties-list-pagination/quickstart.md` y confirmar que los pasos de validación cubren la compilación, la ejecución del endpoint y las comprobaciones de paginación y validación.
-- [ ] T018 Ejecutar `dotnet build app/backend/src/RealtorApi/RealtorApi.csproj` para validar que la feature compila sin errores.
-- [ ] T019 Ejecutar `dotnet test app/backend/tests/RealtorApiTests/RealtorApiTests.csproj --logger "console;verbosity=minimal"` para validar el comportamiento del endpoint, la paginación y la validación del caso inválido.
-- [ ] T020 Revisar que la feature cumpla la constitución y los criterios de aceptación de la spec: backend minimal API, no controladores, no cambio de esquema, validación consistente, URL pública absoluta y metadatos coherentes.
+- [X] T016 [P] Crear y actualizar ejemplos de consulta para `GET /api/properties` y `GET /api/properties?page=1&pageSize=6` en `app/backend/src/RealtorApi/RealtorApi.http` para reflejar la API pública de la feature.
+- [X] T017 [P] Revisar `specs/004-properties-list-pagination/quickstart.md` y confirmar que los pasos de validación cubren la compilación, la ejecución del endpoint y las comprobaciones de paginación y validación.
+- [X] T018 Ejecutar `dotnet build app/backend/src/RealtorApi/RealtorApi.csproj` para validar que la feature compila sin errores.
+- [X] T019 Ejecutar `dotnet test app/backend/tests/RealtorApiTests/RealtorApiTests.csproj --logger "console;verbosity=minimal"` para validar el comportamiento del endpoint, la paginación y la validación del caso inválido.
+- [X] T020 Revisar que la feature cumpla la constitución y los criterios de aceptación de la spec: backend minimal API, no controladores, no cambio de esquema, validación consistente, URL pública absoluta y metadatos coherentes.
 
 ---
 

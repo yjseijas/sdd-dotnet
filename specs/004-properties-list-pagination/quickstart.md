@@ -71,3 +71,11 @@ La feature se considera lista cuando:
 - validación de parámetros con `400` para casos inválidos,
 - `imageUrl` usa host y esquema actuales,
 - orden, metadatos y paginación se mantienen consistentes y verificables.
+
+## Evidencia de verificación
+
+**Fecha**: 2026-10-19
+
+- `dotnet build app/backend/src/RealtorApi/RealtorApi.csproj`: correcto, 0 advertencias y 0 errores.
+- `dotnet test app/backend/tests/RealtorApiTests/RealtorApiTests.csproj --logger "console;verbosity=minimal"`: 19 pruebas superadas, 0 fallidas y 0 omitidas.
+- Las pruebas del endpoint verifican los valores predeterminados y la paginación, el orden estable por título e identificador, las URL absolutas servidas por `/assets/properties/`, los errores `ValidationProblemDetails` para entradas inválidas y el manejo de páginas fuera de rango grandes.

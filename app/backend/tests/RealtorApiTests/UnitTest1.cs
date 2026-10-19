@@ -32,7 +32,7 @@ public sealed class PropertyPersistenceTests
                 BedroomCount = 2,
                 BathroomCount = 1,
                 AreaSquareMeters = 120m,
-                ImageUrl = "/images/properties/1.png",
+                ImageUrl = "/assets/properties/1.png",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = null
             };
@@ -80,7 +80,7 @@ public sealed class PropertyPersistenceTests
                 .OrderBy(property => property.CreatedAt)
                 .FirstAsync();
 
-            Assert.Equal("/images/properties/1.png", firstProperty.ImageUrl);
+            Assert.Equal("/assets/properties/1.png", firstProperty.ImageUrl);
         }
     }
 }

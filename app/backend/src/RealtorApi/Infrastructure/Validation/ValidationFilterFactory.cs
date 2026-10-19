@@ -53,13 +53,14 @@ public static class ValidationFilterFactory
 
         var requestType = request.GetType();
         var validatorType = typeof(IValidator<>).MakeGenericType(requestType);
-        var validator = serviceProvider.GetService(validatorType);
+        var serviceAvailability = serviceProvider.GetService<IServiceProviderIsService>();
 
-        if (validator is null)
+        if (serviceAvailability?.IsService(validatorType) != true)
         {
             return null;
         }
 
+        var validator = serviceProvider.GetRequiredService(validatorType);
         var validationResult = await ((IValidator)validator)
             .ValidateAsync(new ValidationContext<object>(request), cancellationToken);
 

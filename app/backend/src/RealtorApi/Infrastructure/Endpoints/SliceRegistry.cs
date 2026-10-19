@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using RealtorApi.Infrastructure.Validation;
 
 namespace RealtorApi.Infrastructure.Endpoints;
 
@@ -36,9 +37,16 @@ public static class SliceRegistry
     {
         ArgumentNullException.ThrowIfNull(app);
 
+        var group = app.MapGroup(string.Empty);
+        group.AddEndpointFilterFactory((context, next) =>
+        {
+            var factory = ValidationFilterFactory.CreateFactory(context.ApplicationServices);
+            return factory(context, next);
+        });
+
         foreach (var slice in app.ServiceProvider.GetServices<ISlice>().DistinctBy(slice => slice.GetType()))
         {
-            slice.AddEndpoint(app);
+            slice.AddEndpoint(group);
         }
 
         return app;
