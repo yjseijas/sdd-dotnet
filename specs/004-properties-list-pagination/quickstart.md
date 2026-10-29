@@ -27,11 +27,11 @@ dotnet run --project app/backend/src/RealtorApi/RealtorApi.csproj
 Luego consultar:
 
 ```bash
-curl -i "http://localhost:5000/api/properties"
-curl -i "http://localhost:5000/api/properties?page=2&pageSize=6"
-curl -i "http://localhost:5000/api/properties?page=999&pageSize=6"
-curl -i "http://localhost:5000/api/properties?page=0&pageSize=3"
-curl -i "http://localhost:5000/api/properties?page=1&pageSize=101"
+curl -i "http://localhost:5164/api/properties"
+curl -i "http://localhost:5164/api/properties?page=2&pageSize=6"
+curl -i "http://localhost:5164/api/properties?page=999&pageSize=6"
+curl -i "http://localhost:5164/api/properties?page=0&pageSize=3"
+curl -i "http://localhost:5164/api/properties?page=1&pageSize=101"
 ```
 
 Resultado esperado:

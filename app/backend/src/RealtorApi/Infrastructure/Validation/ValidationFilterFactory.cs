@@ -6,8 +6,7 @@ namespace RealtorApi.Infrastructure.Validation;
 
 public static class ValidationFilterFactory
 {
-    public static Func<EndpointFilterFactoryContext, EndpointFilterDelegate, EndpointFilterDelegate> CreateFactory(
-        IServiceProvider serviceProvider)
+    public static Func<EndpointFilterFactoryContext, EndpointFilterDelegate, EndpointFilterDelegate> CreateFactory()
     {
         return (context, next) =>
         {
@@ -27,7 +26,7 @@ public static class ValidationFilterFactory
             {
                 var request = invocationContext.Arguments[requestParameter.Position];
                 var validationProblem = await ValidateAsync(
-                    serviceProvider,
+                    invocationContext.HttpContext.RequestServices,
                     request,
                     invocationContext.HttpContext.RequestAborted);
 

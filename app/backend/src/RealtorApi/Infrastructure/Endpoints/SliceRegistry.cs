@@ -40,7 +40,7 @@ public static class SliceRegistry
         var group = app.MapGroup(string.Empty);
         group.AddEndpointFilterFactory((context, next) =>
         {
-            var factory = ValidationFilterFactory.CreateFactory(context.ApplicationServices);
+            var factory = ValidationFilterFactory.CreateFactory();
             return factory(context, next);
         });
 
