@@ -15,6 +15,7 @@
 ### Sesión 2026-11-01
 
 - Q: ¿Qué hacer con una imagen ya guardada si falla la persistencia de la propiedad? → A: Intentar eliminarla y registrar el fallo si la limpieza también falla.
+- Q: ¿Cuál es el presupuesto máximo de memoria decodificada para imágenes cargadas? → Sin respuesta específica; se adopta el valor predeterminado recomendado de 256 MiB estimados para limitar el riesgo de agotamiento de recursos.
 
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
@@ -39,11 +40,11 @@ Quiero adjuntar una imagen válida al crear una propiedad, para que quede public
 
 **Motivo de prioridad**: La imagen enriquece la ficha y su consumo posterior, sin ser requisito para registrar la propiedad.
 
-**Prueba independiente**: Crear una propiedad con una imagen PNG o JPG válida de hasta 5 MB y comprobar que el archivo queda en la ubicación pública acordada, que la respuesta identifica la propiedad y que `imageUrl` corresponde a la ruta pública del archivo.
+**Prueba independiente**: Crear una propiedad con una imagen PNG o JPG válida de hasta 5 MB y con un costo estimado de memoria decodificada que no supere 256 MiB; comprobar que el archivo queda en la ubicación pública acordada, que la respuesta identifica la propiedad y que `imageUrl` corresponde a la ruta pública del archivo.
 
 **Escenarios de aceptación**:
 
-1. **Dado** que envío una propiedad válida y una imagen PNG o JPG válida cuyo tamaño no supera 5 MB, **Cuando** se completa el alta, **Entonces** recibo HTTP 201 y la imagen queda disponible bajo `/assets/properties/`.
+1. **Dado** que envío una propiedad válida y una imagen PNG o JPG válida cuyo tamaño no supera 5 MB y cuyo costo estimado de memoria decodificada no supera 256 MiB, **Cuando** se completa el alta, **Entonces** recibo HTTP 201 y la imagen queda disponible bajo `/assets/properties/`.
 2. **Dado** que la imagen se almacena correctamente, **Cuando** se persiste la propiedad y se devuelve su representación, **Entonces** `imageUrl` contiene la ruta pública relativa `/assets/properties/{nombre-de-archivo}` y no una ruta física del servidor.
 3. **Dado** que la propiedad creada aparece posteriormente en el listado existente, **Cuando** el cliente consulta `GET /api/properties`, **Entonces** el listado conserva el contrato vigente de presentar la imagen como URL pública absoluta.
 
@@ -55,18 +56,19 @@ Quiero conocer qué dato o archivo impide el alta, para corregir la solicitud si
 
 **Motivo de prioridad**: Rechazar solicitudes inválidas con respuestas previsibles protege la consistencia del catálogo y permite a los clientes corregir sus entradas.
 
-**Prueba independiente**: Enviar solicitudes separadas con datos inválidos, formatos no permitidos, archivos corruptos y tamaños superiores al límite; comprobar el código y los detalles de error, y verificar que no se crea una propiedad.
+**Prueba independiente**: Enviar solicitudes separadas con datos inválidos, formatos no permitidos, archivos corruptos, tamaños o presupuestos de memoria superiores a sus límites; comprobar el código y los detalles de error, y verificar que no se crea una propiedad.
 
 **Escenarios de aceptación**:
 
 1. **Dado** que falta un dato requerido o incumple una regla de validación, **Cuando** envío el alta, **Entonces** recibo HTTP 400 con `ValidationProblemDetails` asociado a los campos inválidos y no se crea una propiedad.
-2. **Dado** que adjunto un archivo que no es una imagen PNG o JPG válida, **Cuando** envío el alta, **Entonces** recibo HTTP 400 con detalles de validación y no se crea una propiedad.
+2. **Dado** que adjunto un archivo que no es una imagen PNG o JPG válida o que supera el presupuesto de memoria decodificada, **Cuando** envío el alta, **Entonces** recibo HTTP 400 con detalles de validación y no se crea una propiedad.
 3. **Dado** que el archivo adjunto supera 5 MB, **Cuando** envío el alta, **Entonces** recibo HTTP 413 con `ProblemDetails` y no se crea una propiedad.
 4. **Dado** que no se puede almacenar la imagen o persistir la propiedad, **Cuando** se procesa el alta, **Entonces** recibo HTTP 500 con `ProblemDetails`, sin exponer rutas físicas ni detalles internos y sin recibir una respuesta de éxito.
 
 ### Casos límite
 
 - Una imagen cuyo tamaño sea exactamente 5 MB se acepta si su formato es válido; cualquier tamaño superior se rechaza.
+- Una imagen cuyo costo estimado de memoria decodificada sea exactamente 256 MiB se acepta si su formato es válido; si supera ese presupuesto, se rechaza como inválida mediante HTTP 400.
 - Se aceptan extensiones `.png`, `.jpg` y `.jpeg`, sin distinguir mayúsculas de minúsculas, siempre que el contenido corresponda a una imagen válida del formato declarado.
 - Un archivo vacío, corrupto, con extensión o tipo de contenido que no corresponda a PNG/JPG, o de otro formato, se rechaza como inválido.
 - La solicitud sin archivo sigue el mismo caso de uso y persiste explícitamente `imageUrl` como `null`.
@@ -84,11 +86,11 @@ Quiero conocer qué dato o archivo impide el alta, para corregir la solicitud si
 - **RF-002**: El endpoint DEBE recibir en una solicitud `multipart/form-data` los campos `title`, `description`, `address`, `price`, `status`, `bedroomCount`, `bathroomCount` y `areaSquareMeters`, y DEBE permitir omitir el archivo opcional `image`.
 - **RF-003**: El sistema DEBE exigir valores no vacíos para `title`, `description` y `address`; un `price` y un `areaSquareMeters` mayores que cero; cantidades `bedroomCount` y `bathroomCount` iguales o mayores que cero; y un `status` perteneciente a `Available`, `Rented` o `Maintenance`.
 - **RF-004**: Cuando no se adjunte `image`, el sistema DEBE crear la propiedad con `imageUrl` igual a `null`, tanto en la persistencia como en la representación de respuesta. El almacenamiento persistente DEBE permitir ese valor nulo.
-- **RF-005**: Cuando se adjunte una imagen, el sistema DEBE aceptar únicamente imágenes PNG o JPG/JPEG válidas, con tamaño máximo inclusivo de 5 MB (5.242.880 bytes), y DEBE rechazar archivos corruptos o cuyo contenido no corresponda al formato permitido.
+- **RF-005**: Cuando se adjunte una imagen, el sistema DEBE aceptar únicamente imágenes PNG o JPG/JPEG válidas, con tamaño máximo inclusivo de 5 MB (5.242.880 bytes) y costo estimado de memoria decodificada no superior a 256 MiB (268.435.456 bytes). DEBE rechazar archivos corruptos, cuyo contenido no corresponda al formato permitido o que excedan el presupuesto de memoria.
 - **RF-006**: El sistema DEBE almacenar las imágenes aceptadas en `app/backend/src/RealtorApi/wwwroot/assets/properties` y publicarlas bajo la ruta `/assets/properties/`; los nombres de archivo DEBEN evitar sobrescrituras y no DEBEN permitir rutas controladas por el cliente.
 - **RF-007**: Si la imagen se almacena correctamente, el sistema DEBE persistir en `imageUrl` y devolver en la respuesta la ruta pública relativa `/assets/properties/{nombre-de-archivo}`. NO DEBE persistir ni revelar una ruta física del sistema de archivos.
 - **RF-008**: Un alta válida DEBE responder HTTP 201 con una representación de la propiedad creada que incluya `id`, todos los campos de propiedad recibidos y `imageUrl`, nullable. El endpoint NO DEBE alterar el contrato existente de `GET /api/properties`, que devuelve URL absoluta pública para imágenes disponibles.
-- **RF-009**: La ausencia de campos requeridos, los valores fuera de las reglas funcionales, el formato de imagen inválido o el contenido corrupto DEBEN responder HTTP 400 con `ValidationProblemDetails`, identificando los errores aplicables y sin crear la propiedad.
+- **RF-009**: La ausencia de campos requeridos, los valores fuera de las reglas funcionales, el formato de imagen inválido, el contenido corrupto o el costo estimado de memoria decodificada superior a 256 MiB DEBEN responder HTTP 400 con `ValidationProblemDetails`, identificando los errores aplicables y sin crear la propiedad.
 - **RF-010**: Un archivo que supere el máximo de 5 MB DEBE responder HTTP 413 con `ProblemDetails` y no DEBE crear la propiedad.
 - **RF-011**: Si falla el almacenamiento del archivo o la persistencia, el endpoint DEBE responder HTTP 500 con `ProblemDetails`, sin exponer rutas físicas, mensajes internos ni secretos. Un fallo al almacenar la imagen NO DEBE dejar creada una propiedad que la referencia. Si la imagen se guardó pero falla la persistencia de la propiedad, el sistema DEBE intentar eliminar el archivo y DEBE registrar el error si la limpieza también falla.
 - **RF-012**: El caso de uso DEBE seguir la arquitectura vertical existente con un slice `ISlice`, un handler concreto registrado mediante `IHandler`, un validator y mapeos explícitos propios del slice para sus contratos y datos de propiedad.
@@ -101,15 +103,15 @@ Quiero conocer qué dato o archivo impide el alta, para corregir la solicitud si
 
 - **Solicitud de alta de propiedad**: Datos de entrada de la nueva propiedad —título, descripción, dirección, precio, estado, dormitorios, baños y superficie— con un archivo de imagen opcional.
 - **Propiedad creada**: Propiedad persistida con sus datos de dominio, identificador y `imageUrl` nullable; si hay imagen, referencia su ubicación pública relativa.
-- **Imagen de propiedad**: Archivo PNG o JPG/JPEG válido que, al aceptarse, queda disponible en la ruta pública de assets de propiedades y se asocia a una propiedad.
+- **Imagen de propiedad**: Archivo PNG o JPG/JPEG válido que cumple los límites de tamaño y memoria decodificada, queda disponible en la ruta pública de assets de propiedades y se asocia a una propiedad.
 
 ## Criterios de éxito *(obligatorio)*
 
 ### Resultados medibles
 
 - **CE-001**: El 100 % de las solicitudes válidas sin imagen devuelve HTTP 201 y persiste una propiedad cuyo `imageUrl` es `null`.
-- **CE-002**: El 100 % de las solicitudes válidas con imagen PNG/JPG de hasta 5 MB devuelve HTTP 201, almacena un archivo accesible bajo `/assets/properties/` y persiste la ruta pública relativa correspondiente.
-- **CE-003**: El 100 % de las solicitudes con datos inválidos o imágenes corruptas/no permitidas recibe HTTP 400 con errores de validación; el 100 % de los archivos mayores a 5 MB recibe HTTP 413; ninguna de estas solicitudes crea una propiedad.
+- **CE-002**: El 100 % de las solicitudes válidas con imagen PNG/JPG de hasta 5 MB y costo estimado de memoria decodificada no superior a 256 MiB devuelve HTTP 201, almacena un archivo accesible bajo `/assets/properties/` y persiste la ruta pública relativa correspondiente.
+- **CE-003**: El 100 % de las solicitudes con datos inválidos, imágenes corruptas/no permitidas o costo estimado de memoria decodificada superior a 256 MiB recibe HTTP 400 con errores de validación; el 100 % de los archivos mayores a 5 MB recibe HTTP 413; ninguna de estas solicitudes crea una propiedad.
 - **CE-004**: El 100 % de los fallos de almacenamiento o persistencia devuelve HTTP 500 con `ProblemDetails` sin revelar detalles internos ni declarar el alta como exitosa.
 - **CE-005**: Una propiedad creada con imagen se puede consumir en el listado existente mediante una URL pública absoluta, y una propiedad sin imagen se representa con `imageUrl` nulo.
 
@@ -119,6 +121,7 @@ Quiero conocer qué dato o archivo impide el alta, para corregir la solicitud si
 - El modelo actual declara `Property.ImageUrl` como no nullable; para cumplir el requisito explícito de crear propiedades sin imagen, esta iniciativa requiere hacer nullable ese dato en el modelo y en el almacenamiento persistente, con el ajuste de esquema limitado necesario.
 - La solicitud de alta utiliza `multipart/form-data` incluso cuando se omite la imagen, con los mismos campos de propiedad en ambos casos.
 - Para hacer verificable el límite solicitado, 5 MB se interpreta como 5 × 1.048.576 bytes (5.242.880 bytes), incluidos.
+- El costo estimado de memoria decodificada se calcula antes de decodificar la imagen y no puede superar 256 × 1.048.576 bytes (268.435.456 bytes).
 - La aceptación de PNG/JPG se determina por la validez y el contenido del archivo además de la extensión declarada; las imágenes de otros formatos no se convierten.
 - La ruta guardada en `imageUrl` es relativa y pública. El listado de la especificación 004 mantiene su comportamiento de construir una URL absoluta pública a partir de esa ruta.
 - La nulabilidad de `ImageUrl` se limita al caso de propiedad sin imagen; no se alteran los campos requeridos restantes, los datos de seed ni el alcance de listado.

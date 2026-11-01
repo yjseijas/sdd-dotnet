@@ -31,6 +31,6 @@
 
 ## Notas
 
-- Revisión completada: se verificaron las reglas de alta con y sin imagen, formatos PNG/JPG, límite inclusivo de 5 MB, respuestas HTTP 201/400/413/500, dependencia de nulabilidad de `imageUrl` frente al modelo actual, dependencias previas y arquitectura vertical solicitada.
+- Revisión completada: se verificaron las reglas de alta con y sin imagen, formatos PNG/JPG, límite inclusivo de 5 MB y presupuesto estimado de memoria decodificada de 256 MiB, respuestas HTTP 201/400/413/500, dependencia de nulabilidad de `imageUrl` frente al modelo actual, dependencias previas y arquitectura vertical solicitada.
 - No se detectaron fallos pendientes ni decisiones críticas sin un valor razonable por defecto.
 - La especificación queda lista para `/speckit.clarify` o `/speckit.plan`.
