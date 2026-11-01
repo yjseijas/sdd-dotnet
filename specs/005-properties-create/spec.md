@@ -16,6 +16,8 @@
 
 - Q: ¿Qué hacer con una imagen ya guardada si falla la persistencia de la propiedad? → A: Intentar eliminarla y registrar el fallo si la limpieza también falla.
 - Q: ¿Cuál es el presupuesto máximo de memoria decodificada para imágenes cargadas? → Sin respuesta específica; se adopta el valor predeterminado recomendado de 256 MiB estimados para limitar el riesgo de agotamiento de recursos.
+- Q: ¿Qué debe devolver `GET /api/properties` en `imageUrl` cuando la propiedad no tiene imagen? → A: Cadena vacía (`""`).
+- Q: ¿Cuál es el límite total del cuerpo `multipart/form-data` y qué respuesta aplica si se excede? → A: 6 MiB (6.291.456 bytes); responder HTTP 413.
 
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
@@ -46,7 +48,7 @@ Quiero adjuntar una imagen válida al crear una propiedad, para que quede public
 
 1. **Dado** que envío una propiedad válida y una imagen PNG o JPG válida cuyo tamaño no supera 5 MB y cuyo costo estimado de memoria decodificada no supera 256 MiB, **Cuando** se completa el alta, **Entonces** recibo HTTP 201 y la imagen queda disponible bajo `/assets/properties/`.
 2. **Dado** que la imagen se almacena correctamente, **Cuando** se persiste la propiedad y se devuelve su representación, **Entonces** `imageUrl` contiene la ruta pública relativa `/assets/properties/{nombre-de-archivo}` y no una ruta física del servidor.
-3. **Dado** que la propiedad creada aparece posteriormente en el listado existente, **Cuando** el cliente consulta `GET /api/properties`, **Entonces** el listado conserva el contrato vigente de presentar la imagen como URL pública absoluta.
+3. **Dado** que la propiedad creada aparece posteriormente en el listado existente, **Cuando** el cliente consulta `GET /api/properties`, **Entonces** una imagen disponible se presenta como URL pública absoluta y una propiedad sin imagen presenta `imageUrl` como cadena vacía (`""`).
 
 ---
 
@@ -63,12 +65,14 @@ Quiero conocer qué dato o archivo impide el alta, para corregir la solicitud si
 1. **Dado** que falta un dato requerido o incumple una regla de validación, **Cuando** envío el alta, **Entonces** recibo HTTP 400 con `ValidationProblemDetails` asociado a los campos inválidos y no se crea una propiedad.
 2. **Dado** que adjunto un archivo que no es una imagen PNG o JPG válida o que supera el presupuesto de memoria decodificada, **Cuando** envío el alta, **Entonces** recibo HTTP 400 con detalles de validación y no se crea una propiedad.
 3. **Dado** que el archivo adjunto supera 5 MB, **Cuando** envío el alta, **Entonces** recibo HTTP 413 con `ProblemDetails` y no se crea una propiedad.
-4. **Dado** que no se puede almacenar la imagen o persistir la propiedad, **Cuando** se procesa el alta, **Entonces** recibo HTTP 500 con `ProblemDetails`, sin exponer rutas físicas ni detalles internos y sin recibir una respuesta de éxito.
+4. **Dado** que el cuerpo total `multipart/form-data`, incluidos archivo, campos y sobrecarga multipart, supera 6 MiB (6.291.456 bytes), **Cuando** envío el alta, **Entonces** recibo HTTP 413 con `ProblemDetails` antes del model binding y no se crea una propiedad.
+5. **Dado** que no se puede almacenar la imagen o persistir la propiedad, **Cuando** se procesa el alta, **Entonces** recibo HTTP 500 con `ProblemDetails`, sin exponer rutas físicas ni detalles internos y sin recibir una respuesta de éxito.
 
 ### Casos límite
 
 - Una imagen cuyo tamaño sea exactamente 5 MB se acepta si su formato es válido; cualquier tamaño superior se rechaza.
 - Una imagen cuyo costo estimado de memoria decodificada sea exactamente 256 MiB se acepta si su formato es válido; si supera ese presupuesto, se rechaza como inválida mediante HTTP 400.
+- El cuerpo multipart de hasta 6 MiB (6.291.456 bytes), inclusive, puede procesarse; si supera ese límite, se rechaza con HTTP 413 antes del model binding.
 - Se aceptan extensiones `.png`, `.jpg` y `.jpeg`, sin distinguir mayúsculas de minúsculas, siempre que el contenido corresponda a una imagen válida del formato declarado.
 - Un archivo vacío, corrupto, con extensión o tipo de contenido que no corresponda a PNG/JPG, o de otro formato, se rechaza como inválido.
 - La solicitud sin archivo sigue el mismo caso de uso y persiste explícitamente `imageUrl` como `null`.
@@ -89,9 +93,9 @@ Quiero conocer qué dato o archivo impide el alta, para corregir la solicitud si
 - **RF-005**: Cuando se adjunte una imagen, el sistema DEBE aceptar únicamente imágenes PNG o JPG/JPEG válidas, con tamaño máximo inclusivo de 5 MB (5.242.880 bytes) y costo estimado de memoria decodificada no superior a 256 MiB (268.435.456 bytes). DEBE rechazar archivos corruptos, cuyo contenido no corresponda al formato permitido o que excedan el presupuesto de memoria.
 - **RF-006**: El sistema DEBE almacenar las imágenes aceptadas en `app/backend/src/RealtorApi/wwwroot/assets/properties` y publicarlas bajo la ruta `/assets/properties/`; los nombres de archivo DEBEN evitar sobrescrituras y no DEBEN permitir rutas controladas por el cliente.
 - **RF-007**: Si la imagen se almacena correctamente, el sistema DEBE persistir en `imageUrl` y devolver en la respuesta la ruta pública relativa `/assets/properties/{nombre-de-archivo}`. NO DEBE persistir ni revelar una ruta física del sistema de archivos.
-- **RF-008**: Un alta válida DEBE responder HTTP 201 con una representación de la propiedad creada que incluya `id`, todos los campos de propiedad recibidos y `imageUrl`, nullable. El endpoint NO DEBE alterar el contrato existente de `GET /api/properties`, que devuelve URL absoluta pública para imágenes disponibles.
+- **RF-008**: Un alta válida DEBE responder HTTP 201 con una representación de la propiedad creada que incluya `id`, todos los campos de propiedad recibidos y `imageUrl`, nullable. El endpoint NO DEBE alterar el contrato existente de `GET /api/properties`: devuelve URL absoluta pública para imágenes disponibles y cadena vacía (`""`) cuando no hay imagen.
 - **RF-009**: La ausencia de campos requeridos, los valores fuera de las reglas funcionales, el formato de imagen inválido, el contenido corrupto o el costo estimado de memoria decodificada superior a 256 MiB DEBEN responder HTTP 400 con `ValidationProblemDetails`, identificando los errores aplicables y sin crear la propiedad.
-- **RF-010**: Un archivo que supere el máximo de 5 MB DEBE responder HTTP 413 con `ProblemDetails` y no DEBE crear la propiedad.
+- **RF-010**: Un archivo que supere el máximo de 5 MB DEBE responder HTTP 413 con `ProblemDetails` y no DEBE crear la propiedad. El endpoint DEBE limitar el tamaño total del cuerpo `multipart/form-data` a 6 MiB (6.291.456 bytes), incluidos archivo, campos y sobrecarga multipart, antes del model binding; si el cuerpo supera ese límite, DEBE responder HTTP 413 con `ProblemDetails` y no DEBE crear la propiedad.
 - **RF-011**: Si falla el almacenamiento del archivo o la persistencia, el endpoint DEBE responder HTTP 500 con `ProblemDetails`, sin exponer rutas físicas, mensajes internos ni secretos. Un fallo al almacenar la imagen NO DEBE dejar creada una propiedad que la referencia. Si la imagen se guardó pero falla la persistencia de la propiedad, el sistema DEBE intentar eliminar el archivo y DEBE registrar el error si la limpieza también falla.
 - **RF-012**: El caso de uso DEBE seguir la arquitectura vertical existente con un slice `ISlice`, un handler concreto registrado mediante `IHandler`, un validator y mapeos explícitos propios del slice para sus contratos y datos de propiedad.
 - **RF-013**: El sistema DEBE descubrir y registrar automáticamente el slice mediante `ISlice` y el handler mediante `IHandler`; agregar el caso de uso NO DEBE requerir un registro individual en `Program.cs`.
@@ -111,9 +115,9 @@ Quiero conocer qué dato o archivo impide el alta, para corregir la solicitud si
 
 - **CE-001**: El 100 % de las solicitudes válidas sin imagen devuelve HTTP 201 y persiste una propiedad cuyo `imageUrl` es `null`.
 - **CE-002**: El 100 % de las solicitudes válidas con imagen PNG/JPG de hasta 5 MB y costo estimado de memoria decodificada no superior a 256 MiB devuelve HTTP 201, almacena un archivo accesible bajo `/assets/properties/` y persiste la ruta pública relativa correspondiente.
-- **CE-003**: El 100 % de las solicitudes con datos inválidos, imágenes corruptas/no permitidas o costo estimado de memoria decodificada superior a 256 MiB recibe HTTP 400 con errores de validación; el 100 % de los archivos mayores a 5 MB recibe HTTP 413; ninguna de estas solicitudes crea una propiedad.
+- **CE-003**: El 100 % de las solicitudes con datos inválidos, imágenes corruptas/no permitidas o costo estimado de memoria decodificada superior a 256 MiB recibe HTTP 400 con errores de validación; el 100 % de los archivos mayores a 5 MB y de los cuerpos multipart mayores a 6 MiB recibe HTTP 413; ninguna de estas solicitudes crea una propiedad.
 - **CE-004**: El 100 % de los fallos de almacenamiento o persistencia devuelve HTTP 500 con `ProblemDetails` sin revelar detalles internos ni declarar el alta como exitosa.
-- **CE-005**: Una propiedad creada con imagen se puede consumir en el listado existente mediante una URL pública absoluta, y una propiedad sin imagen se representa con `imageUrl` nulo.
+- **CE-005**: Una propiedad creada con imagen se puede consumir en el listado existente mediante una URL pública absoluta; una propiedad sin imagen se representa con `imageUrl` como cadena vacía (`""`).
 
 ## Supuestos
 

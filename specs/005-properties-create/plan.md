@@ -57,10 +57,11 @@ Añadir `POST /api/properties` como slice Minimal API auto-descubrible, con entr
 
 ### Persistencia de archivos y compensación
 
-- Comprobar el tamaño de `IFormFile` antes de decodificarlo o escribirlo. No fijar el límite del cuerpo HTTP exactamente en 5 MB, pues el multipart contiene además límites y campos.
+- Antes del model binding, aplicar al `POST /api/properties` un límite agregado inclusivo de 6.291.456 bytes al cuerpo HTTP completo, incluidos archivo, campos, boundaries y encabezados multipart. Un middleware de la aplicación, situado antes del binding, debe rechazar inmediatamente un `Content-Length` superior y, para los demás casos, leer y almacenar como máximo el límite más un byte antes de continuar; si se excede, debe responder HTTP 413 con `ProblemDetails` sin invocar el endpoint ni crear la propiedad. Cuando el cuerpo no exceda el máximo, debe dejarse disponible desde el inicio para el model binding. No usar `MultipartBodyLengthLimit` como único control del total, ya que no representa el límite agregado del cuerpo. La configuración del servidor o proxy no debe interceptar estas solicitudes con un error que omita el `ProblemDetails` requerido.
+- Después del parseo multipart y antes de decodificar o escribir la imagen, comprobar que el archivo individual no supere 5.242.880 bytes; un exceso responde HTTP 413 con `ProblemDetails`. Este control es independiente del límite agregado de 6 MiB.
 - Determinar el formato real por el contenido, cotejarlo con `.png`, `.jpg` o `.jpeg` y el MIME correspondiente, y rechazar archivos vacíos, incompatibles o corruptos mediante `ValidationProblemDetails`.
 - Usar `Image.Identify()` y su estimación de memoria decodificada antes de cargar píxeles. Rechazar con HTTP 400 cualquier archivo cuya estimación supere 268.435.456 bytes; no se define un límite independiente de dimensiones.
-- La validación no decodifica archivos por encima del máximo. Un filtro específico del endpoint los corta con HTTP 413 y `ProblemDetails`; así se conserva el tamaño máximo del archivo sin confundirlo con el tamaño total del cuerpo multipart.
+- No decodificar ni escribir archivos que excedan su límite individual; mantener separado ese control del middleware que limita el cuerpo total antes del model binding.
 - Generar el nombre en el servidor (GUID más extensión derivada del formato detectado) y crear el archivo sin sobrescritura; nunca usar el nombre original como ruta.
 - Guardar primero la imagen y luego la propiedad. Si falla la persistencia, intentar eliminar exactamente el archivo recién escrito; registrar estructuradamente cualquier error de limpieza y devolver HTTP 500 genérico.
 - Publicar solo el directorio previsto. Crear `wwwroot/assets/properties` antes de configurar su `PhysicalFileProvider` y añadir la ruta estática `/assets/properties`; mantener sin cambios los proveedores de assets de seed existentes.
@@ -75,7 +76,7 @@ Añadir `POST /api/properties` como slice Minimal API auto-descubrible, con entr
 |---|---|
 | 201 | Propiedad creada: `id`, campos recibidos y `imageUrl` nullable. |
 | 400 | `ValidationProblemDetails` para datos, imagen inválida o presupuesto estimado de memoria decodificada excedido. |
-| 413 | `ProblemDetails` cuando el archivo exceda 5.242.880 bytes. |
+| 413 | `ProblemDetails` cuando el archivo exceda 5.242.880 bytes o el cuerpo multipart total exceda 6.291.456 bytes. |
 | 500 | `ProblemDetails` genérico para fallos de almacenamiento o persistencia; sin detalle interno. |
 
 No se define un `Location` ni se altera el contrato de `GET /api/properties`.
@@ -128,7 +129,7 @@ Prerequisitos: SDK definido en `global.json`, licencia/clave de ImageSharp confi
 2. Ejecutar `dotnet test app/backend/tests/RealtorApiTests/RealtorApiTests.csproj`.
 3. Las pruebas unitarias cubrirán límites de validación de datos, formatos y extensiones admitidos, contenido corrupto, ausencia de imagen, el tamaño inclusivo de 5.242.880 bytes, la estimación inclusiva de 268.435.456 bytes, rechazo de valores superiores, nombre generado y limpieza del archivo tras un fallo de persistencia cuando sea aislable sin pruebas de integración.
 4. Revisar la migración y el snapshot: el cambio `Up` solo vuelve nullable `ImageUrl`; comprobar su `Down` y que no introduce cambios en otras columnas. El `Down` volverá a exigir un valor y puede fallar si ya existen propiedades creadas sin imagen; no eliminar datos automáticamente.
-5. En una ejecución manual con base de datos configurada, verificar las respuestas 201/400/413/500 y que `/assets/properties/{nombre-generado}` sirve la imagen. Estas comprobaciones no autorizan agregar pruebas de integración automatizadas.
+5. En una ejecución manual con base de datos configurada, verificar las respuestas 201/400/413/500 y que `/assets/properties/{nombre-generado}` sirve la imagen. Verificar además que un cuerpo multipart de exactamente 6.291.456 bytes no sea rechazado por el límite agregado y que uno de 6.291.457 bytes responda HTTP 413 con `ProblemDetails` antes del model binding, sin invocar el handler ni crear la propiedad. Estas comprobaciones no autorizan agregar pruebas de integración automatizadas.
 
 ## Comprobación de la constitución posterior al diseño
 
