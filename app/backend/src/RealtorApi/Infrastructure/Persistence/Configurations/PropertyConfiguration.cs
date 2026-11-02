@@ -47,7 +47,7 @@ public sealed class PropertyConfiguration : IEntityTypeConfiguration<Property>
 
         builder.Property(property => property.ImageUrl)
             .HasMaxLength(500)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(property => property.CreatedAt)
             .IsRequired();

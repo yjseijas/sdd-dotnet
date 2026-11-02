@@ -49,7 +49,7 @@ public static class GetPropertiesQuery
             Items: items);
     }
 
-    private static string BuildAbsoluteImageUrl(string imageUrl, string requestHost, string requestScheme)
+    private static string BuildAbsoluteImageUrl(string? imageUrl, string requestHost, string requestScheme)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
         {

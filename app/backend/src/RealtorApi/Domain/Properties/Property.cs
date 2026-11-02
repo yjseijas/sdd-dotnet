@@ -20,7 +20,7 @@ public sealed class Property
 
     public decimal AreaSquareMeters { get; set; }
 
-    public string ImageUrl { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

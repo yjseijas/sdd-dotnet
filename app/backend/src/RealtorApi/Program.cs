@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using RealtorApi.Features.Properties.CreateProperty;
 using RealtorApi.Infrastructure.Endpoints;
 using RealtorApi.Infrastructure.Handlers;
 using RealtorApi.Infrastructure.Persistence;
@@ -42,8 +43,24 @@ builder.Services.AddProblemDetails();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddSlices(typeof(Program).Assembly);
 builder.Services.AddHandlers(typeof(Program).Assembly);
+builder.Services.AddScoped<IPropertyImageStorage, PropertyImageStorage>();
 
 var app = builder.Build();
+
+var propertyImagesFolder = Path.Combine(
+    app.Environment.ContentRootPath,
+    "wwwroot",
+    "assets",
+    "properties");
+Directory.CreateDirectory(propertyImagesFolder);
+
+app.UseMiddleware<CreatePropertyRequestBodyLimitMiddleware>();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(propertyImagesFolder),
+    RequestPath = "/assets/properties"
+});
 
 var seedImagesFolder = Path.Combine(AppContext.BaseDirectory, "support", "seed-data", "images");
 
