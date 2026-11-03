@@ -10,6 +10,13 @@
 
 **Entrada**: Descripción del usuario: "Crear la especificación 006-properties-update para definir un nuevo caso de uso de actualización de propiedades mediante un slice Minimal API en backend, con carga opcional de imagen y el comportamiento de imágenes de la especificación 005."
 
+## Clarificaciones
+
+### Sesión 2026-11-03
+
+- P: ¿Qué comportamiento debe observarse si dos solicitudes actualizan la misma propiedad al mismo tiempo? → A: Prevalece la última actualización persistida; no se detecta ni rechaza el conflicto concurrente.
+- P: ¿Debe esta funcionalidad imponer un límite de frecuencia propio para solicitudes anónimas? → A: No; no se aplica límite en la aplicación y queda a cargo de infraestructura externa.
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 ### Historia de usuario 1: Actualizar una propiedad sin imagen (Prioridad: P1)
@@ -72,17 +79,19 @@ Como persona que consume el servicio, quiero recibir errores previsibles cuando 
 - Una solicitud sin archivo conserva exactamente la `imageUrl` previa; no existe una acción de quitar la imagen.
 - Una colisión de nombre no sobrescribe archivos: el nombre UUID se genera en el servidor y la escritura no reemplaza archivos existentes.
 - Una ruta física nunca forma parte de una respuesta pública ni puede ser suministrada por el cliente.
+- Si dos actualizaciones de la misma propiedad se procesan concurrentemente, prevalecen los valores de la última actualización persistida; no se detecta ni se rechaza el conflicto.
 - Ante identificador inexistente no se escribe un archivo ni se modifica la propiedad. Antes de efectos externos se validan los datos y se comprueba la existencia de la propiedad.
 - Si falla la escritura de la imagen nueva, la base de datos permanece sin cambios. Si falla la persistencia tras escribir la imagen nueva, se intenta retirar únicamente ese archivo nuevo; un fallo de compensación se registra estructuradamente.
 - Después de guardar la nueva URL, la limpieza de la imagen previa es posterior y no revierte la operación. Solo aplica a archivos bajo almacenamiento administrado de propiedades no referenciados por otras propiedades; nunca elimina archivos de seed, externos o compartidos.
 - La actualización pública y anónima no concede acceso a rutas físicas ni habilita acceso a archivos fuera del almacenamiento público previsto.
+- La aplicación no impone un límite de frecuencia propio a las solicitudes de actualización; cualquier limitación corresponde a la infraestructura externa.
 - La actualización reutiliza la entidad y persistencia actuales; no agrega entidades ni relaciones ni requiere cambios de esquema.
 
 ## Requisitos *(obligatorio)*
 
 ### Requisitos funcionales
 
-- **RF-001**: El sistema DEBE ofrecer una actualización pública y anónima de una propiedad existente por identificador mediante `PUT /api/properties/{id}` o una ruta equivalente que preserve esa semántica. Una actualización completada DEBE responder HTTP 200 con la representación actualizada de la propiedad, incluidos sus campos de negocio e `imageUrl`.
+- **RF-001**: El sistema DEBE ofrecer una actualización pública y anónima de una propiedad existente por identificador mediante `PUT /api/properties/{id}` o una ruta equivalente que preserve esa semántica. Una actualización completada DEBE responder HTTP 200 con la representación actualizada de la propiedad, incluidos sus campos de negocio e `imageUrl`. Si hay actualizaciones concurrentes de una misma propiedad, DEBE prevalecer la última actualización persistida; el sistema NO DEBE detectar ni rechazar el conflicto.
 - **RF-002**: El endpoint DEBE recibir `multipart/form-data`, incluso si no se envía imagen, con los campos editables `title`, `description`, `address`, `price`, `status`, `bedroomCount`, `bathroomCount` y `areaSquareMeters`, y un archivo opcional `image`.
 - **RF-003**: El sistema DEBE rechazar como no editables los valores enviados por el cliente para `id`, `CreatedAt`, `UpdatedAt` e `ImageUrl`; el identificador de ruta y los valores administrados por el sistema prevalecen.
 - **RF-004**: El sistema DEBE exigir `title`, `description` y `address` no vacíos; `price` y `areaSquareMeters` mayores que cero; `bedroomCount` y `bathroomCount` mayores o iguales a cero; y un `status` igual a `Available`, `Rented` o `Maintenance`. Si incumple una regla de negocio, DEBE responder HTTP 400 con `ValidationProblemDetails` y no producir efectos de actualización.
@@ -98,6 +107,7 @@ Como persona que consume el servicio, quiero recibir errores previsibles cuando 
 - **RF-014**: La actualización DEBE seguir la arquitectura Vertical Slice existente en el alcance de esta funcionalidad: un slice, handler, mapping y validator propios; descubrimiento y registro automáticos mediante `ISlice` e `IHandler`; y mapping puro, sin validación ni lógica de negocio.
 - **RF-015**: La validación y los errores DEBEN integrarse con la infraestructura de FluentValidation y `ProblemDetails` vigente. Las pruebas automatizadas de esta funcionalidad DEBEN limitarse a pruebas unitarias; no se incluyen pruebas HTTP ni de integración.
 - **RF-016**: La actualización DEBE reutilizar la entidad y persistencia de propiedades y conservar compatibilidad con las especificaciones 001–005, incluido el contrato del listado y el comportamiento de creación. NO DEBE introducir cambios de esquema.
+- **RF-017**: La aplicación NO DEBE imponer un límite de frecuencia propio a las solicitudes de actualización; la limitación de solicitudes, si se configura, corresponde a la infraestructura externa.
 
 ### Entidades principales *(si la funcionalidad maneja datos)*
 
