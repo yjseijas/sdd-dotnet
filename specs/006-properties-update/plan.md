@@ -134,10 +134,12 @@ consolidan en este archivo para respetar la lista constitucional de artefactos.
   El cómputo incluye archivo, campos, boundaries y sobrecarga multipart, y es
   independiente del máximo individual de archivo, 5.242.880 bytes inclusive.
 - La validación automática de FluentValidation comprueba los campos de negocio
-  antes del handler. El handler localiza primero la propiedad mediante el
-  identificador de ruta; si no existe, responde `404` sin mutar base de datos,
-  escribir ni borrar archivos. No se almacena la imagen antes de comprobar
-  existencia.
+  antes del handler. El formato GUID del identificador de ruta se valida antes
+  de consultar el handler; un identificador malformado produce `400
+  ValidationProblemDetails` sin consulta ni efectos. Para un GUID válido, el
+  handler localiza primero la propiedad; si no existe, responde `404` sin
+  mutar base de datos, escribir ni borrar archivos. No se almacena la imagen
+  antes de comprobar existencia.
 - Una solicitud debe ser multipart incluso sin archivo. El enlazador solo expone
   los ocho campos permitidos y `image`; `id`, `CreatedAt`, `UpdatedAt` e
   `ImageUrl` no forman parte del contrato de entrada ni se vinculan como datos:
@@ -169,7 +171,7 @@ consolidan en este archivo para respetar la lista constitucional de artefactos.
   separadores codificados/ambiguos, rutas absolutas, rutas externas y rutas
   fuera del directorio; no aceptar una ruta del cliente. No borrar recursos
   seed, externos o compartidos. La eliminación segura usa el servicio de
-  almacenamiento y no confía en un path físico recibido desde HTTP.
+  almacenamiento y no confía en una ruta física recibida desde HTTP.
 - Si falla la limpieza posterior, registrar el error estructuradamente, pero
   conservar el éxito HTTP 200 y el estado ya persistido. No intentar revertir
   la propiedad o la nueva imagen por ese fallo.
@@ -177,6 +179,11 @@ consolidan en este archivo para respetar la lista constitucional de artefactos.
   los valores de la última persistencia exitosa prevalecen. No se añade control
   de concurrencia. No se impone límite de frecuencia en la aplicación; queda a
   cargo de infraestructura externa.
+- En una carrera entre reemplazos, una solicitud puede haber persistido su
+  imagen nueva antes de que otra actualización sobrescriba su URL. El archivo
+  desplazado puede quedar sin referencias; se acepta este huérfano y no se
+  realiza un barrido global. La limpieza de imágenes previas sigue verificando
+  las referencias al momento de decidir y nunca elimina archivos compartidos.
 - **Alternativa descartada**: Transacción de base de datos que pretenda incluir
   el sistema de archivos no hace atómicos ambos recursos; se usa compensación
   explícita para la escritura nueva y limpieza posterior no bloqueante para la
@@ -207,8 +214,8 @@ una acción para retirar una imagen.
 | HTTP | Respuesta |
 |---|---|
 | `200` | Representación explícita de la propiedad actualizada: `id`, ocho campos de negocio e `imageUrl` (incluido sin cambio si no se envió archivo). |
-| `400` | `ValidationProblemDetails` para reglas de negocio o presupuesto de memoria decodificada superior a 268.435.456 bytes. |
-| `404` | `ProblemDetails` para GUID sin propiedad; sin efectos de escritura/eliminación. |
+| `400` | `ValidationProblemDetails` para GUID malformado, reglas de negocio o presupuesto de memoria decodificada superior a 268.435.456 bytes. |
+| `404` | `ProblemDetails` para GUID válido sin propiedad; sin efectos de escritura/eliminación. |
 | `413` | `ProblemDetails` si el archivo excede 5.242.880 bytes o el cuerpo completo excede 6.291.456 bytes antes del enlace de parámetros. |
 | `415` | `ProblemDetails` para archivo vacío, formato no permitido, corrupto o discrepancia entre contenido, extensión y MIME. |
 | `500` | `ProblemDetails` genérico ante fallos de escritura o persistencia; sin excepción, ruta física ni detalle interno. |
@@ -267,6 +274,7 @@ app/backend/tests/RealtorApiTests/Properties/UpdateProperty/
 ├── UpdatePropertyValidatorTests.cs
 ├── UpdatePropertyMappingTests.cs
 ├── UpdatePropertyHandlerTests.cs
+├── UpdatePropertyErrorMappingTests.cs
 └── PropertyImageStorageUpdateTests.cs
 ```
 
@@ -289,7 +297,12 @@ de los ajustes de reutilización indispensables.
   posterior mediante `AppDbContext` y el componente de almacenamiento.
 - `UpdatePropertySlice`: mapear método/ruta, delegar al `IHandler`, traducir
   `Result<T>` y el error `property.image_invalid` a los contratos HTTP de esta
-  feature. No contiene lógica de negocio.
+  feature. Aislar el parseo del GUID de ruta en una operación directamente
+  invocable: ante un identificador malformado, producir `400
+  ValidationProblemDetails` antes de invocar el handler. La conversión de
+  resultados de error también debe quedar disponible como mapeo directamente
+  invocable para pruebas unitarias, sin iniciar un servidor. El slice no
+  contiene lógica de negocio.
 - Middleware existente: aplicar el límite agregado al PUT antes de model
   binding y conservar el mismo control para POST.
 
@@ -304,10 +317,14 @@ Testcontainers ni PostgreSQL; no se escribirán pruebas HTTP/integración.
   cantidades, estado y límites de persistencia.
 - Mapeo: todos los campos editables, aislamiento de `Id`/auditoría/`ImageUrl`
   del input y respuesta con la URL correcta.
+- Mapeo de errores: probar directamente, sin servidor HTTP, la conversión a
+  `ProblemDetails`/`ValidationProblemDetails` y los estados `400`, `404`,
+  `413`, `415` y `500`; incluir el rechazo de identificador GUID malformado
+  antes del handler.
 - Almacenamiento: reuso/adaptación de pruebas existentes para PNG/JPEG,
   extensión/MIME/contenido no coincidentes, vacío/corrupto, límites inclusivos
   y excesos de 5.242.880 y 268.435.456 bytes, UUID, `CreateNew`, ruta pública
-  y contención segura del path. Comprobar que los rechazos no escriben archivos.
+  y contención segura de la ruta. Comprobar que los rechazos no escriben archivos.
 - Handler: sin archivo conserva exactamente URL/archivo; inexistente no llama
   al almacenamiento; imagen válida guarda URL; fallo de escritura no persiste;
   fallo de persistencia intenta retirar solo el archivo nuevo y conserva la
@@ -343,9 +360,11 @@ repositorio.
    aprobada, sin conexión a PostgreSQL.
 2. Con API y base de datos de desarrollo disponibles, comprobar `PUT` multipart
    sin imagen (`200`, campos actualizados y URL previa sin cambios), con imagen
-   (ruta pública UUID y contenido servido), GUID inexistente (`404` sin
-   escrituras), validación de negocio (`400`), imagen inválida (`415`), exceso
-   de memoria (`400`) y fallos técnicos (`500` genérico).
+   (ruta pública UUID y contenido servido), GUID malformado (`400
+   ValidationProblemDetails` sin consulta ni escrituras), GUID válido
+   inexistente (`404` sin escrituras), validación de negocio (`400`), imagen
+   inválida (`415`), exceso de memoria (`400`) y fallos técnicos (`500`
+   genérico).
 3. En el control de cuerpo anterior al enlace de parámetros, verificar que un
    cuerpo de 6.291.456 bytes se acepta por el límite agregado y uno de
    6.291.457 bytes se rechaza con `413 ProblemDetails` antes de ejecutar el
@@ -356,7 +375,9 @@ repositorio.
    externa, compartida, traversal y ruta fuera del directorio. Solo la primera
    se elimina. Forzar fallo de persistencia para observar compensación del
    archivo nuevo; forzar fallo al limpiar el anterior para confirmar éxito
-   persistido con log y respuesta exitosa.
+   persistido con log y respuesta exitosa. Confirmar que no se intenta un
+   barrido global de archivos huérfanos y que un archivo nuevo desplazado por
+   una actualización concurrente puede permanecer sin referencias.
 5. Para CE-005, documentar sistema operativo, CPU/RAM, versión SDK/runtime,
    configuración de compilación, ubicación/versión de base de datos,
    almacenamiento y ubicación del cliente. En la misma configuración no

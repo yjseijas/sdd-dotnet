@@ -57,7 +57,7 @@ persistida sin detección ni rechazo de concurrencia.
 
 - [ ] T009 [P] [US1] Crear pruebas unitarias xUnit en `app/backend/tests/RealtorApiTests/Properties/UpdateProperty/UpdatePropertyValidatorTests.cs` para entradas válidas y fronteras válidas de los campos requeridos.
 - [ ] T010 [P] [US1] Crear pruebas unitarias xUnit en `app/backend/tests/RealtorApiTests/Properties/UpdateProperty/UpdatePropertyMappingTests.cs` para el mapeo de los ocho campos y response, y comprobar que el input no permite cambiar `Id`, `CreatedAt`, `UpdatedAt` ni `ImageUrl`.
-- [ ] T011 [US1] Crear pruebas unitarias xUnit en `app/backend/tests/RealtorApiTests/Properties/UpdateProperty/UpdatePropertyHandlerTests.cs` para la actualización sin imagen, conservación exacta de `imageUrl`, ausencia de llamadas al almacenamiento y concurrencia con prevalencia de la última persistencia exitosa; no introducir token de concurrencia, rechazo de conflicto, `DbSet` simulado ni pruebas HTTP.
+- [ ] T011 [US1] Crear pruebas unitarias xUnit en `app/backend/tests/RealtorApiTests/Properties/UpdateProperty/UpdatePropertyHandlerTests.cs` para la actualización sin imagen, conservación exacta de `imageUrl`, ausencia de llamadas al almacenamiento y política de prevalencia de la última actualización persistida; verificar que la limpieza no borra archivos que puedan seguir referenciados y documentar que una imagen desplazada por concurrencia puede quedar huérfana sin barrido global; no introducir token de concurrencia, rechazo de conflicto, `DbSet` simulado ni pruebas HTTP.
 
 **Punto de control**: La edición sin imagen es verificable unitariamente y
 conserva los recursos existentes.
@@ -97,8 +97,9 @@ pruebas HTTP automatizadas.
 ### Implementación y verificación unitaria
 
 - [ ] T017 [P] [US3] Completar en `app/backend/src/RealtorApi/Features/Properties/UpdateProperty/UpdatePropertyValidator.cs` las reglas para texto no vacío, máximos persistentes, decimales compatibles con `decimal(18,2)`, cantidades no negativas y estados permitidos; ampliar `app/backend/tests/RealtorApiTests/Properties/UpdateProperty/UpdatePropertyValidatorTests.cs` con casos inválidos y fronteras.
-- [ ] T018 [US3] Completar el mapeo de resultados en `app/backend/src/RealtorApi/Features/Properties/UpdateProperty/UpdatePropertySlice.cs`: `404` inexistente, `400` validación/memoria, `413` exceso individual de archivo, `415` imagen inválida y `500 ProblemDetails` genérico para fallos técnicos, sin detalles internos ni rutas físicas.
+- [ ] T018 [US3] Completar en `app/backend/src/RealtorApi/Features/Properties/UpdateProperty/UpdatePropertySlice.cs` una operación directamente invocable para parsear el GUID de ruta y rechazar un valor malformado con `400 ValidationProblemDetails` antes de llamar al handler; implementar también la conversión directamente invocable de resultados: `400 ValidationProblemDetails` para validación y memoria; `404` para GUID válido inexistente; `413` para exceso individual de archivo; `415` para imagen inválida; y `500 ProblemDetails` genérico para fallos técnicos, sin detalles internos ni rutas físicas.
 - [ ] T019 [US3] Completar en `app/backend/tests/RealtorApiTests/Properties/UpdateProperty/UpdatePropertyHandlerTests.cs` las pruebas unitarias de GUID inexistente sin llamada a almacenamiento ni mutación, datos inválidos sin efectos, fallos técnicos con estado previo preservado y fallo de compensación registrado estructuradamente.
+- [ ] T020 [US3] Crear `app/backend/tests/RealtorApiTests/Properties/UpdateProperty/UpdatePropertyErrorMappingTests.cs` con pruebas unitarias directas del mapeo `400`, `404`, `413`, `415` y `500`, incluidos los cuerpos `ProblemDetails`/`ValidationProblemDetails` y el rechazo de GUID malformado antes de invocar el handler; no iniciar servidor ni agregar pruebas HTTP/de integración.
 
 **Punto de control**: Los rechazos no modifican propiedad ni recursos, y las
 respuestas no revelan información interna.
@@ -108,12 +109,12 @@ respuestas no revelan información interna.
 **Objetivo**: Ejecutar las verificaciones aprobadas, comprobar compatibilidad y
 registrar los límites de la validación manual.
 
-- [ ] T020 Compilar la solución con `dotnet build app/Realtor.sln`; resolver errores sin incorporar cambios fuera del alcance indicado en `specs/006-properties-update/plan.md`.
-- [ ] T021 Ejecutar `dotnet test` para `app/backend/tests/RealtorApiTests/RealtorApiTests.csproj`, sin exigir PostgreSQL ni credenciales y sin agregar pruebas HTTP o de integración.
-- [ ] T022 En un entorno aislado no productivo disponible, verificar manualmente los casos multipart, códigos y ausencia de efectos descritos en `specs/006-properties-update/plan.md`, incluidos los límites inclusivos de archivo y memoria, cuerpo agregado de 6.291.456/6.291.457 bytes antes del model binding, limpieza segura y compatibilidad de POST/GET; no automatizar solicitudes HTTP ni alterar seeds. Registrar el resultado en esta tarea de `specs/006-properties-update/tasks.md`; si el entorno no está disponible, indicar que no se ejecutó.
-- [ ] T023 Si existe un entorno no productivo aislado, ejecutar manualmente la medición CE-005 según `specs/006-properties-update/plan.md`: 100 solicitudes válidas controladas, 50 sin imagen y 50 con imagen fija de 1 MiB y 1024×768, secuenciales desde el mismo cliente tras cinco solicitudes de calentamiento; registrar en esta tarea de `specs/006-properties-update/tasks.md` entorno, cargas y resultado, y comprobar p95 inferior a un segundo. No crear benchmark ni prueba HTTP automatizada; si no hay entorno, no declarar aprobado el criterio.
-- [ ] T024 Revisar el diff completo de `app/backend/` y los componentes `app/backend/src/RealtorApi/Features/Properties/UpdateProperty/`, `app/backend/src/RealtorApi/Features/Properties/CreateProperty/` y `app/backend/src/RealtorApi/Program.cs` para confirmar que no se alteraron esquema, migraciones, seeds, POST/GET, contrato de creación, registros individuales, control de concurrencia ni rate limiting de aplicación; confirmar también que no se agregaron paquetes, claves o secretos.
-- [ ] T025 Ejecutar `git diff --check` y revisar `specs/006-properties-update/tasks.md` para confirmar cobertura RF-001–RF-017 y CE-001–CE-006, rutas válidas, ausencia de archivos auxiliares y que el estado `Borrador` en `specs/006-properties-update/spec.md` no haya cambiado.
+- [ ] T021 Compilar la solución con `dotnet build app/Realtor.sln`; resolver errores sin incorporar cambios fuera del alcance indicado en `specs/006-properties-update/plan.md`.
+- [ ] T022 Ejecutar `dotnet test` para `app/backend/tests/RealtorApiTests/RealtorApiTests.csproj`, sin exigir PostgreSQL ni credenciales y sin agregar pruebas HTTP o de integración.
+- [ ] T023 En un entorno aislado no productivo disponible, verificar manualmente los casos multipart, códigos y ausencia de efectos descritos en `specs/006-properties-update/plan.md`, incluidos los GUID malformados (`400 ValidationProblemDetails` antes del handler), GUID válidos inexistentes (`404`), límites inclusivos de archivo y memoria, cuerpo agregado de 6.291.456/6.291.457 bytes antes del model binding, limpieza segura y compatibilidad de POST/GET; no automatizar solicitudes HTTP ni alterar seeds. Registrar el resultado en esta tarea de `specs/006-properties-update/tasks.md`; si el entorno no está disponible, indicar que no se ejecutó.
+- [ ] T024 Si existe un entorno no productivo aislado, ejecutar manualmente la medición CE-005 según `specs/006-properties-update/plan.md`: 100 solicitudes válidas controladas, 50 sin imagen y 50 con imagen fija de 1 MiB y 1024×768, secuenciales desde el mismo cliente tras cinco solicitudes de calentamiento; registrar en esta tarea de `specs/006-properties-update/tasks.md` entorno, cargas y resultado, y comprobar p95 inferior a un segundo. No crear benchmark ni prueba HTTP automatizada; si no hay entorno, no declarar aprobado el criterio.
+- [ ] T025 Revisar el diff completo de `app/backend/` y los componentes `app/backend/src/RealtorApi/Features/Properties/UpdateProperty/`, `app/backend/src/RealtorApi/Features/Properties/CreateProperty/` y `app/backend/src/RealtorApi/Program.cs` para confirmar que no se alteraron esquema, migraciones, seeds, POST/GET, contrato de creación, registros individuales, control de concurrencia ni rate limiting de aplicación; confirmar también que no se agregaron paquetes, claves o secretos.
+- [ ] T026 Ejecutar `git diff --check` y revisar `specs/006-properties-update/tasks.md` para confirmar cobertura RF-001–RF-017 y CE-001–CE-006, rutas válidas, ausencia de archivos auxiliares y que el estado `Borrador` en `specs/006-properties-update/spec.md` no haya cambiado.
 
 ## Dependencias y orden de ejecución
 
@@ -132,9 +133,10 @@ registrar los límites de la validación manual.
   T013.
 - **US3 (Fase 5)**: Depende de US1 y US2 porque completa la validación y los
   resultados de error del mismo slice. T017 precede a la validación final;
-  T018 completa el contrato de errores y T019 comprueba el rechazo sin efectos.
-- **Cierre (Fase 6)**: T020–T021 requieren la implementación integrada; T022
-  y T023 solo se ejecutan si hay entorno aislado no productivo; T024–T025
+  T018 completa el contrato de errores; T019 prueba los rechazos del handler y
+  T020 prueba el mapeo de resultados después de T018.
+- **Cierre (Fase 6)**: T021–T022 requieren la implementación integrada; T023
+  y T024 solo se ejecutan si hay entorno aislado no productivo; T025–T026
   verifican alcance y formato al final.
 
 ### Dependencias entre historias
@@ -154,9 +156,10 @@ registrar los límites de la validación manual.
   disponer de sus respectivos tipos/mapping.
 - En US2, T015 puede ejecutarse en paralelo con T013 una vez acordada e
   implementada la interfaz de almacenamiento de T012: usan archivos distintos.
-- En US3, T017 y la revisión de errores de T018 afectan archivos distintos y
-  pueden prepararse en paralelo tras integrar US2; T019 depende de los
-  resultados que prueba.
+- En US3, T017 y T018 afectan archivos distintos y pueden prepararse en
+  paralelo tras integrar US2; T019 y T020 son pruebas unitarias en archivos
+  distintos que pueden ejecutarse en paralelo una vez completadas sus
+  implementaciones.
 - No se marca como paralela ninguna tarea que comparta un archivo con otra
   tarea pendiente. Aunque los archivos de US1–US3 sean compartidos, las
   historias se implementan en orden para evitar conflictos y mantener cada
@@ -173,5 +176,5 @@ Este es el alcance sugerido para el primer incremento.
 ### Entrega incremental
 
 Después del MVP, implementar US2 (T012–T016) para reemplazo y limpieza segura;
-continuar con US3 (T017–T019) para rechazos y errores. Cerrar con T020–T025,
+continuar con US3 (T017–T020) para rechazos y errores. Cerrar con T021–T026,
 sin convertir las verificaciones manuales del plan en pruebas HTTP.

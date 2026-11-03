@@ -18,7 +18,7 @@
 - [x] Los criterios de éxito son medibles. **Evaluación**: incluyen proporciones del 100 %, códigos de respuesta y p95 inferior a 1 segundo sobre 100 solicitudes válidas.
 - [x] Los criterios de éxito son agnósticos respecto de la tecnología. **Evaluación**: miden resultados de usuario, consistencia, respuestas y latencia; no dependen de infraestructura o herramientas concretas.
 - [x] Todos los escenarios de aceptación están definidos. **Evaluación**: cada historia P1–P3 incluye escenarios independientes y verificables, incluidos éxito, rechazo y fallos compensables.
-- [x] Se identifican los casos límite. **Evaluación**: se documentan límites inclusivos de archivo, cuerpo y memoria, archivo vacío, discrepancias de formato, colisiones, inexistencia y limpieza segura.
+- [x] Se identifican los casos límite. **Evaluación**: se documentan límites inclusivos de archivo, cuerpo y memoria, archivo vacío, discrepancias de formato, GUID malformado y válido inexistente, colisiones, concurrencia y limpieza segura, incluida la posibilidad aceptada de archivos huérfanos sin barrido global.
 - [x] El alcance está claramente delimitado. **Evaluación**: se especifican actualización, conservación o reemplazo de imagen, anonimato y exclusiones explícitas como quitar imagen, HTTP/integración y cambios de esquema.
 - [x] Se identifican las dependencias y los supuestos. **Evaluación**: se enumeran las especificaciones 001–005 y se declaran el identificador existente, la semántica sin imagen, la compensación y la medición de latencia.
 
@@ -33,5 +33,7 @@
 
 - Revisión completada en una pasada: 16 de 16 criterios aprobados.
 - Se distingue expresamente el límite individual de archivo de 5.242.880 bytes del límite agregado multipart de 6.291.456 bytes, y del presupuesto de memoria decodificada de 268.435.456 bytes.
-- La respuesta HTTP 415 para archivo vacío, formato no permitido o contenido inválido/mismatch es específica del alcance de actualización y prevalece aquí sobre el tratamiento HTTP 400 de ciertas imágenes inválidas en la especificación 005 de creación.
-- No se identifican fallos pendientes ni marcadores de clarificación; la especificación está lista para `/speckit.clarify` o `/speckit.plan`.
+- La respuesta HTTP 415 para archivo vacío, formato no permitido o contenido inválido/discrepante es específica del alcance de actualización y prevalece aquí sobre el tratamiento HTTP 400 de ciertas imágenes inválidas en la especificación 005 de creación.
+- Un identificador malformado responde 400 con detalles de validación; un GUID válido sin propiedad responde 404. La política de prevalencia de la última actualización persistida puede dejar una imagen sin referencias en una carrera concurrente; no se realiza barrido global.
+- El plan y las tareas incorporan pruebas unitarias directas del mapeo de errores a `ProblemDetails` y `ValidationProblemDetails`, sin pruebas HTTP automatizadas.
+- No se identifican fallos pendientes ni marcadores de clarificación; la iniciativa permanece en estado **Borrador** y requiere aprobación mediante el flujo del proyecto antes de iniciar la implementación.
