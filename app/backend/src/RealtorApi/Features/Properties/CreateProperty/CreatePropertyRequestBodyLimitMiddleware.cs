@@ -66,9 +66,25 @@ public sealed class CreatePropertyRequestBodyLimitMiddleware(RequestDelegate nex
 
     private static bool IsTargetRequest(HttpRequest request)
     {
-        return HttpMethods.IsPost(request.Method)
-            && string.Equals(request.Path.Value, "/api/properties", StringComparison.OrdinalIgnoreCase)
-            && request.ContentType?.StartsWith("multipart/form-data", StringComparison.OrdinalIgnoreCase) == true;
+        var isMultipart = request.ContentType?.StartsWith("multipart/form-data", StringComparison.OrdinalIgnoreCase) == true;
+        if (!isMultipart)
+        {
+            return false;
+        }
+
+        var path = request.Path.Value ?? string.Empty;
+        if (HttpMethods.IsPost(request.Method))
+        {
+            return string.Equals(path, "/api/properties", StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (HttpMethods.IsPut(request.Method))
+        {
+            return path.StartsWith("/api/properties/", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(path, "/api/properties", StringComparison.OrdinalIgnoreCase);
+        }
+
+        return false;
     }
 
     private static async Task WritePayloadTooLargeAsync(HttpContext context)

@@ -103,6 +103,11 @@ public sealed class CreatePropertyHandlerTests
 
             return Task.CompletedTask;
         }
+
+        public Task DeleteIfManagedAsync(string? imageUrl, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class FailingSaveChangesInterceptor : SaveChangesInterceptor

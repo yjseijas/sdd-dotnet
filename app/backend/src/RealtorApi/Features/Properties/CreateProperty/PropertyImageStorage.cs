@@ -19,6 +19,10 @@ public interface IPropertyImageStorage
     Task DeleteAsync(
         StoredPropertyImage image,
         CancellationToken cancellationToken);
+
+    Task DeleteIfManagedAsync(
+        string? imageUrl,
+        CancellationToken cancellationToken);
 }
 
 public sealed class PropertyImageStorage(
@@ -197,7 +201,58 @@ public sealed class PropertyImageStorage(
             throw new InvalidOperationException("The image path is outside the property image directory.");
         }
 
-        File.Delete(actualPath);
+        if (File.Exists(actualPath))
+        {
+            File.Delete(actualPath);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteIfManagedAsync(
+        string? imageUrl,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return Task.CompletedTask;
+        }
+
+        var candidatePath = imageUrl;
+        if (Uri.TryCreate(imageUrl, UriKind.Absolute, out var absoluteUri))
+        {
+            candidatePath = absoluteUri.AbsolutePath;
+        }
+
+        if (!candidatePath.StartsWith("/assets/properties/", StringComparison.OrdinalIgnoreCase)
+            || candidatePath.Contains("..", StringComparison.Ordinal))
+        {
+            return Task.CompletedTask;
+        }
+
+        var fileName = Path.GetFileName(candidatePath);
+        if (string.IsNullOrWhiteSpace(fileName)
+            || fileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        var expectedDirectory = Path.GetFullPath(Path.Combine(
+            environment.ContentRootPath,
+            "wwwroot",
+            "assets",
+            "properties"));
+        var physicalPath = Path.GetFullPath(Path.Combine(expectedDirectory, fileName));
+
+        if (!physicalPath.StartsWith(expectedDirectory, StringComparison.OrdinalIgnoreCase)
+            || !File.Exists(physicalPath))
+        {
+            return Task.CompletedTask;
+        }
+
+        File.Delete(physicalPath);
         return Task.CompletedTask;
     }
 
@@ -212,7 +267,7 @@ public sealed class PropertyImageStorage(
         string contentType)
     {
         var declaredExtension = Path.GetExtension(fileName);
-        var declaredContentType = contentType.Split(';', 2)[0].Trim();
+        var declaredContentType = (contentType ?? string.Empty).Split(';', 2)[0].Trim();
 
         if (string.Equals(format?.Name, "PNG", StringComparison.OrdinalIgnoreCase)
             && string.Equals(declaredExtension, ".png", StringComparison.OrdinalIgnoreCase)
